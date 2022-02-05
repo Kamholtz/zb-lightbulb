@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "light_bulb"
+		}
+    ],
+    "settings": {
+        "nrf-connect.topdir": "c:\\Users\\carlk\\ncs\\v1.8.0",
+        "nrf-connect.toolchain.path": "c:\\Users\\carlk\\ncs\\v1.8.0\\toolchain",
+        "nrf-connect.applications": [
+            "c:\\repos\\zb-lightbulb\\light_bulb"
+        ],
+        "files.associations": {
+            "zigbee_zcl_scenes.h": "c"
+        }
+    }
+}
