@@ -513,6 +513,9 @@ void main(void)
 	bulb_clusters_attr_init();
 	level_control_set_value(dev_ctx.level_control_attr.current_level);
 
+    // Legacy support for Sonoff ZigBee Bridge running Tasmota
+    zb_bdb_set_legacy_device_support(1);
+
 	/* Initialize ZCL scene table */
 	zcl_scenes_init();
 
