@@ -12,11 +12,13 @@
 #include <zephyr/types.h>
 #include <zephyr.h>
 #include <device.h>
+#include <devicetree.h>
 #include <soc.h>
 #include <drivers/pwm.h>
 #include <logging/log.h>
 #include <dk_buttons_and_leds.h>
 #include <settings/settings.h>
+#include <drivers/gpio.h>
 
 #include <zboss_api.h>
 #include <zboss_api_addons.h>
@@ -81,7 +83,12 @@
 /* Use onboard led4 to act as a light bulb.
  * The app.overlay file has this at node label "pwm_led3" in /pwmleds.
  */
+
+#if 1
+#define PWM_DK_LED4_NODE                DT_NODELABEL(green_pwm_led)
+#else
 #define PWM_DK_LED4_NODE                DT_NODELABEL(pwm_led3)
+#endif
 
 /* Nordic PWM nodes don't have flags cells in their specifiers, so
  * this is just future-proofing.
@@ -490,48 +497,87 @@ void zboss_signal_handler(zb_bufid_t bufid)
 	}
 }
 
+/* 1000 msec = 1 sec */
+#define SLEEP_TIME_MS   1000
+
+/* The devicetree node identifier for the "led0" alias. */
+#define LED0_NODE DT_ALIAS(led0)
+
+#if DT_NODE_HAS_STATUS(LED0_NODE, okay)
+#define LED0	DT_GPIO_LABEL(LED0_NODE, gpios)
+#define PIN	DT_GPIO_PIN(LED0_NODE, gpios)
+#define FLAGS	DT_GPIO_FLAGS(LED0_NODE, gpios)
+#else
+/* A build error here means your board isn't set up to blink an LED. */
+#error "Unsupported board: led0 devicetree alias is not defined"
+#define LED0	""
+#define PIN	0
+#define FLAGS	0
+#endif
+
+
 void main(void)
 {
 	int blink_status = 0;
 	int err;
 
-	LOG_INF("Starting ZBOSS Light Bulb example");
+	// LOG_INF("Starting ZBOSS Light Bulb example");
 
-	/* Initialize */
-	configure_gpio();
-	err = settings_subsys_init();
-	if (err) {
-		LOG_ERR("settings initialization failed");
+	const struct device *dev;
+	bool led_is_on = true;
+	int ret;
+
+	dev = device_get_binding(LED0);
+	if (dev == NULL) {
+		return;
 	}
 
-	/* Register callback for handling ZCL commands. */
-	ZB_ZCL_REGISTER_DEVICE_CB(zcl_device_cb);
-
-	/* Register dimmer switch device context (endpoints). */
-	ZB_AF_REGISTER_DEVICE_CTX(&dimmable_light_ctx);
-
-	bulb_clusters_attr_init();
-	level_control_set_value(dev_ctx.level_control_attr.current_level);
-
-    // Legacy support for Sonoff ZigBee Bridge running Tasmota
-    zb_bdb_set_legacy_device_support(1);
-
-	/* Initialize ZCL scene table */
-	zcl_scenes_init();
-
-	/* Settings should be loaded after zcl_scenes_init */
-	err = settings_load();
-	if (err) {
-		LOG_ERR("settings loading failed");
+	ret = gpio_pin_configure(dev, PIN, GPIO_OUTPUT_ACTIVE | FLAGS);
+	if (ret < 0) {
+		return;
 	}
-
-	/* Start Zigbee default thread */
-	zigbee_enable();
-
-	LOG_INF("ZBOSS Light Bulb example started");
 
 	while (1) {
-		dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
-		k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
+		gpio_pin_set(dev, PIN, (int)led_is_on);
+		led_is_on = !led_is_on;
+		k_msleep(SLEEP_TIME_MS);
 	}
+
+	// /* Initialize */
+	// configure_gpio();
+	// err = settings_subsys_init();
+	// if (err) {
+	// 	LOG_ERR("settings initialization failed");
+	// }
+
+	// /* Register callback for handling ZCL commands. */
+	// // ZB_ZCL_REGISTER_DEVICE_CB(zcl_device_cb);
+
+	// /* Register dimmer switch device context (endpoints). */
+	// ZB_AF_REGISTER_DEVICE_CTX(&dimmable_light_ctx);
+
+	// bulb_clusters_attr_init();
+	// level_control_set_value(dev_ctx.level_control_attr.current_level);
+
+    // // Legacy support for Sonoff ZigBee Bridge running Tasmota
+    // zb_bdb_set_legacy_device_support(1);
+
+	// /* Initialize ZCL scene table */
+	// zcl_scenes_init();
+
+	// /* Settings should be loaded after zcl_scenes_init */
+	// err = settings_load();
+	// if (err) {
+	// 	LOG_ERR("settings loading failed");
+	// }
+
+	// /* Start Zigbee default thread */
+	// zigbee_enable();
+
+	// LOG_INF("ZBOSS Light Bulb example started");
+
+	// while (1) {
+	// 	dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
+	// 	k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
+	// }
 }

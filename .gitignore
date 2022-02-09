@@ -52,12 +52,6 @@ Mkfile.old
 dkms.conf
 
 
-light_bulb/build
-light_bulb/build/.ninja_deps
-light_bulb/build/.ninja_log
-light_bulb/build/build.ninja
-light_bulb/build/CMakeCache.txt
-light_bulb/build/zephyr/.cmake.dotconfig.checksum
-light_bulb/build/zephyr/.config.old
-light_bulb/build/zephyr/edt.pickle
-light_bulb/build/zephyr/zephyr.lst
+light_bulb/*build*
+light_bulb/nrf52840-dongle/
+light_bulb/nrf52840-dongle/*
