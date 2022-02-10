@@ -55,3 +55,4 @@ dkms.conf
 light_bulb/*build*
 light_bulb/nrf52840-dongle/
 light_bulb/nrf52840-dongle/*
+light_bulb_dongle/build-*

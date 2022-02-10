@@ -14,6 +14,10 @@
         {
             "name": "network_coordinator_dongle",
             "path": "..\\nrf_network_coordinator_dongle\\network_coordinator_dongle"
+        },
+        {
+            "name": "light_bulb_dongle",
+            "path": "light_bulb_dongle"
         }
     ],
     "settings": {
@@ -21,9 +25,8 @@
         "nrf-connect.toolchain.path": "${nrf-connect.toolchain:1.8.0}",
         "nrf-connect.applications": [
             "c:\\repos\\zb-lightbulb\\light_bulb",
-            "c:\\repos\\nrf-pwm\\led_pwm",
-            "c:\\repos\\nrf-blinky\\blinky",
-            "${workspaceFolder:network_coordinator_dongle}"
+            "${workspaceFolder:network_coordinator_dongle}",
+            "${workspaceFolder:light_bulb_dongle}"
         ],
         "files.associations": {
             "zigbee_zcl_scenes.h": "c",
