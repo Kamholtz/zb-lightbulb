@@ -99,6 +99,20 @@
 #error "Choose supported PWM driver"
 #endif
 
+/* Use onboard led4 to act as a light bulb.
+ * The app.overlay file has this at node label "pwm_led3" in /pwmleds.
+ */
+#define PWM_PIN_NODE                DT_NODELABEL(red_pwm_led)
+
+#if DT_NODE_HAS_STATUS(PWM_DK_LED4_NODE, okay)
+/* Get the defines from overlay file. */
+#define PWM_PIN_CTLR                DT_PWMS_CTLR(PWM_PIN_NODE)
+#define PWM_PIN_CHANNEL             DT_PWMS_CHANNEL(PWM_PIN_NODE)
+#define PWM_PIN_FLAGS               FLAGS_OR_ZERO(PWM_PIN_NODE)
+#else
+#error "Choose supported PWM driver"
+#endif
+
 /* Led PWM period, calculated for 50 Hz signal - in microseconds. */
 #define LED_PWM_PERIOD_US               (USEC_PER_SEC / 50U)
 
@@ -125,6 +139,7 @@ static bulb_device_ctx_t dev_ctx;
 
 /* Pointer to PWM device controlling leds with pwm signal. */
 static const struct device *led_pwm_dev;
+static const struct device *pin_pwm_dev;
 
 ZB_ZCL_DECLARE_IDENTIFY_ATTRIB_LIST(
 	identify_attr_list,
@@ -227,6 +242,16 @@ static void pwm_led_init(void)
 	}
 }
 
+/**@brief Function for initializing additional PWM pin. */
+static void pwm_pin_init(void)
+{
+	pin_pwm_dev = DEVICE_DT_GET(PWM_PIN_CTLR);
+	if (!device_is_ready(pin_pwm_dev)) {
+		LOG_ERR("Error: PWM device %s is not ready",
+			pin_pwm_dev->name);
+	}
+}
+
 /**@brief Function for initializing LEDs and Buttons. */
 static void configure_gpio(void)
 {
@@ -243,6 +268,7 @@ static void configure_gpio(void)
 	}
 
 	pwm_led_init();
+	pwm_pin_init();
 }
 
 /**@brief Sets brightness of bulb luminous executive element
@@ -257,6 +283,22 @@ static void light_bulb_set_brightness(zb_uint8_t brightness_level)
 	if (pwm_pin_set_usec(led_pwm_dev, PWM_DK_LED4_CHANNEL,
 			     LED_PWM_PERIOD_US, pulse, PWM_DK_LED4_FLAGS)) {
 		LOG_ERR("Pwm led 4 set fails:\n");
+		return;
+	}
+}
+
+/**@brief Sets brightness of bulb luminous executive element
+ *
+ * @param[in] brightness_level Brightness level, allowed values 0 ... 255,
+ *                             0 - turn off, 255 - full brightness.
+ */
+static void external_light_bulb_set_brightness(zb_uint8_t brightness_level)
+{
+	uint32_t pulse = brightness_level * LED_PWM_PERIOD_US / 255U;
+
+	if (pwm_pin_set_usec(pin_pwm_dev, PWM_PIN_CHANNEL,
+			     LED_PWM_PERIOD_US, pulse, PWM_PIN_FLAGS)) {
+		LOG_ERR("External PWM pin set fails:\n");
 		return;
 	}
 }
@@ -303,6 +345,7 @@ static void level_control_set_value(zb_uint16_t new_level)
 	}
 
 	light_bulb_set_brightness(new_level);
+    external_light_bulb_set_brightness(new_level);
 }
 
 /**@brief Function for turning ON/OFF the light bulb.
@@ -326,6 +369,7 @@ static void on_off_set_value(zb_bool_t on)
 			dev_ctx.level_control_attr.current_level);
 	} else {
 		light_bulb_set_brightness(0U);
+		external_light_bulb_set_brightness(0U);
 	}
 }
 
