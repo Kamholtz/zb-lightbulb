@@ -45,7 +45,7 @@
 #define BULB_INIT_BASIC_MANUF_NAME      "Nordic"
 
 /* Model number assigned by manufacturer (32-bytes long string). */
-#define BULB_INIT_BASIC_MODEL_ID        "Dimable_Light_v0.1"
+#define BULB_INIT_BASIC_MODEL_ID        "Dimable_Light_v0.2"
 
 /* First 8 bytes specify the date of manufacturer of the device
  * in ISO 8601 format (YYYYMMDD). The rest (8 bytes) are manufacturer specific.
@@ -81,7 +81,7 @@
 /* Use onboard led4 to act as a light bulb.
  * The app.overlay file has this at node label "pwm_led3" in /pwmleds.
  */
-#define PWM_DK_LED4_NODE                DT_NODELABEL(blue_pwm_led)
+#define PWM_DK_LED4_NODE                DT_ALIAS(pwm_on_board)
 
 /* Nordic PWM nodes don't have flags cells in their specifiers, so
  * this is just future-proofing.
@@ -102,7 +102,7 @@
 /* Use onboard led4 to act as a light bulb.
  * The app.overlay file has this at node label "pwm_led3" in /pwmleds.
  */
-#define PWM_PIN_NODE                DT_NODELABEL(red_pwm_led)
+#define PWM_PIN_NODE                DT_NODELABEL(ext_pwm_led)
 
 #if DT_NODE_HAS_STATUS(PWM_DK_LED4_NODE, okay)
 /* Get the defines from overlay file. */
