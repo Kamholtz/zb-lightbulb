@@ -9,13 +9,12 @@
 		zephyr,entropy = &rng;
 	};
 
-
 	pwmleds {
 		pwm_led3: pwm_led_3 {
 			pwms = <&pwm0 16>;
 		};
 		ext_pwm_led: pwm_led_4 {
-			pwms = < &pwm0 0xa >;
+			pwms = < &pwm0 10 >;
 		};
 	};
 
@@ -23,4 +22,11 @@
 		pwm-on-board = &pwm_led3;
 		pwm-ext0 = &ext_pwm_led;
     };
+};
+
+&pwm0 {
+    ch1-pin = < 16 >;
+    ch1-inverted;
+    ch2-pin = < 10 >;
+    ch2-inverted;
 };
