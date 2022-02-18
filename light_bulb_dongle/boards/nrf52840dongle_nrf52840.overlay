@@ -19,7 +19,7 @@
 
     pwmleds {
 		ext_pwm_led: pwm_led_3 {
-			pwms = < &pwm0 0xa >;
+			pwms = < &pwm0 42 >;
 		};
     };
 
@@ -28,4 +28,9 @@
         pwm-on-board = &blue_pwm_led;
         pwm-ext0 = &ext_pwm_led;
 	};
+};
+
+&pwm0 {
+    ch3-pin = < 42 >;
+    ch3-inverted;
 };
