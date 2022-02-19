@@ -114,7 +114,7 @@
 #endif
 
 /* Led PWM period, calculated for 50 Hz signal - in microseconds. */
-#define LED_PWM_PERIOD_US               (USEC_PER_SEC / 50U)
+#define LED_PWM_PERIOD_US               (USEC_PER_SEC / 25000U)
 
 #ifndef ZB_ROUTER_ROLE
 #error Define ZB_ROUTER_ROLE to compile router source code.
@@ -577,6 +577,7 @@ void main(void)
 	while (1) {
 		dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
 		k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
+        LOG_INF("Slept");
 	}
 
 }
