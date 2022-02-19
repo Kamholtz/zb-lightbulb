@@ -15,6 +15,7 @@
 #include <drivers/pwm.h>
 #include <logging/log.h>
 #include <dk_buttons_and_leds.h>
+#include <drivers/gpio.h>
 #include <settings/settings.h>
 
 #include <zboss_api.h>
@@ -112,6 +113,24 @@
 #else
 #error "Choose supported PWM driver"
 #endif
+
+
+#define PRESCENCE_NODE	DT_ALIAS(presence_sensor)
+#if !DT_NODE_HAS_STATUS(PRESCENCE_NODE, okay)
+#error "Unsupported board: presence_sensor devicetree alias is not defined"
+#endif
+
+static const struct gpio_dt_spec button = GPIO_DT_SPEC_GET_OR(PRESCENCE_NODE, gpios,
+							      {0});
+static struct gpio_callback button_cb_data;
+
+
+void button_pressed(const struct device *dev, struct gpio_callback *cb,
+		    uint32_t pins)
+{
+	printk("Button pressed at %" PRIu32 "\n", k_cycle_get_32());
+}
+
 
 /* Led PWM period, calculated for 50 Hz signal - in microseconds. */
 #define LED_PWM_PERIOD_US               (USEC_PER_SEC / 25000U)
@@ -548,6 +567,35 @@ void main(void)
 		LOG_ERR("settings initialization failed");
 	}
 
+    int ret;
+	if (!device_is_ready(button.port)) {
+		printk("Error: button device %s is not ready\n",
+		       button.port->name);
+		return;
+	}
+
+	ret = gpio_pin_configure_dt(&button, GPIO_INPUT);
+	if (ret != 0) {
+		printk("Error %d: failed to configure %s pin %d\n",
+		       ret, button.port->name, button.pin);
+		return;
+	}
+
+	ret = gpio_pin_interrupt_configure_dt(&button,
+					      GPIO_INT_EDGE_TO_ACTIVE);
+	if (ret != 0) {
+		printk("Error %d: failed to configure interrupt on %s pin %d\n",
+			ret, button.port->name, button.pin);
+		return;
+	}
+
+    gpio_init_callback(&button_cb_data, button_pressed, BIT(button.pin));
+	gpio_add_callback(button.port, &button_cb_data);
+	printk("Set up button at %s pin %d\n", button.port->name, button.pin);
+
+	printk("Press the button\n");
+
+
 	/* Register callback for handling ZCL commands. */
 	ZB_ZCL_REGISTER_DEVICE_CB(zcl_device_cb);
 
@@ -577,7 +625,6 @@ void main(void)
 	while (1) {
 		dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
 		k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
-        LOG_INF("Slept");
 	}
 
 }
