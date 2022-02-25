@@ -34,6 +34,9 @@
 /* Device endpoint, used to receive light controlling commands. */
 #define HA_DIMMABLE_LIGHT_ENDPOINT      10
 
+/* Device endpoint, used to receive occupancy sensing commands. */
+#define HA_OCCUPANCY_SENSING_ENDPOINT   11
+
 /* Version of the application software (1 byte). */
 #define BULB_INIT_BASIC_APP_VERSION     01
 
@@ -214,14 +217,14 @@ ZB_ZCL_DECLARE_OCCUPANCY_SENSING_ATTRIB_LIST(
 
 /** @cond internals_doc */
 
-#define ZB_HA_OCCUPANCY_SENSING_IN_CLUSTER_NUM 3  /*!< Dimmable Light IN (server) clusters number */
-#define ZB_HA_OCCUPANCY_SENSING_OUT_CLUSTER_NUM 0 /*!< Dimmable Light OUT (client) clusters number */
+#define ZB_HA_OCCUPANCY_SENSING_IN_CLUSTER_NUM 3  /*!< Occupancy Sensing IN (server) clusters number */
+#define ZB_HA_OCCUPANCY_SENSING_OUT_CLUSTER_NUM 0 /*!< Occupancy Sensing OUT (client) clusters number */
 
-/** Dimmable light total (IN+OUT) cluster number */
+/** Occupancy sensing total (IN+OUT) cluster number */
 #define ZB_HA_OCCUPANCY_SENSING_CLUSTER_NUM                                \
   (ZB_HA_OCCUPANCY_SENSING_IN_CLUSTER_NUM +  ZB_HA_OCCUPANCY_SENSING_OUT_CLUSTER_NUM)
 
-/*! Number of attribute for reporting on Dimmable Light device */
+/*! Number of attribute for reporting on Occupancy Sensing device */
 #define ZB_HA_OCCUPANCY_SENSING_REPORT_ATTR_COUNT         \
   (ZB_ZCL_ON_OFF_REPORT_ATTR_COUNT + ZB_ZCL_LEVEL_CONTROL_REPORT_ATTR_COUNT)
 
@@ -230,9 +233,13 @@ ZB_ZCL_DECLARE_OCCUPANCY_SENSING_ATTRIB_LIST(
 /** @endcond */
 
 
+// https://www.nxp.com/docs/en/user-guide/JN-UG-3076.pdf
+#define ZB_HA_OCCUPANCY_SENSING_DEVICE_ID  0x107
+#define ZB_HA_DEVICE_VER_OCCUPANCY_SENSING 1
+
 /*! @cond internals_doc */
 /*!
-  @brief Declare simple descriptor for Dimmable Light device
+  @brief Declare simple descriptor for Occupancy Sensing device
   @param ep_name - endpoint variable name
   @param ep_id - endpoint ID
   @param in_clust_num - number of supported input clusters
@@ -264,21 +271,21 @@ ZB_ZCL_DECLARE_OCCUPANCY_SENSING_ATTRIB_LIST(
   @param cluster_list - endpoint cluster list
  */
 /* TODO: add scenes? */
-#define ZB_HA_DECLARE_OCCPANCY_SENSING_EP(ep_name, ep_id, cluster_list)           \
+#define ZB_HA_DECLARE_OCCUPANCY_SENSING_EP(ep_name, ep_id, cluster_list)               \
   ZB_ZCL_DECLARE_HA_OCCUPANCY_SENSING_SIMPLE_DESC(ep_name, ep_id,                     \
     ZB_HA_OCCUPANCY_SENSING_IN_CLUSTER_NUM, ZB_HA_OCCUPANCY_SENSING_OUT_CLUSTER_NUM); \
-  ZBOSS_DEVICE_DECLARE_REPORTING_CTX(reporting_info## device_ctx_name,          \
-                                     ZB_HA_OCCUPANCY_SENSING_REPORT_ATTR_COUNT);   \
-  ZBOSS_DEVICE_DECLARE_LEVEL_CONTROL_CTX(cvc_alarm_info## device_ctx_name,      \
-                                         ZB_HA_OCCUPANCY_SENSING_CVC_ATTR_COUNT);  \
-  ZB_AF_DECLARE_ENDPOINT_DESC(ep_name, ep_id, ZB_AF_HA_PROFILE_ID,                       \
-    0,                                                                          \
-    NULL,                                                                       \
-    ZB_ZCL_ARRAY_SIZE(cluster_list, zb_zcl_cluster_desc_t), cluster_list,       \
-                          (zb_af_simple_desc_1_1_t*)&simple_desc_##ep_name,     \
-                          ZB_HA_OCCUPANCY_SENSING_REPORT_ATTR_COUNT,               \
-                          reporting_info## device_ctx_name,                     \
-                          ZB_HA_OCCUPANCY_SENSING_CVC_ATTR_COUNT,                  \
+  ZBOSS_DEVICE_DECLARE_REPORTING_CTX(reporting_info## device_ctx_name,                \
+                                     ZB_HA_OCCUPANCY_SENSING_REPORT_ATTR_COUNT);      \
+  ZBOSS_DEVICE_DECLARE_LEVEL_CONTROL_CTX(cvc_alarm_info## device_ctx_name,            \
+                                         ZB_HA_OCCUPANCY_SENSING_CVC_ATTR_COUNT);     \
+  ZB_AF_DECLARE_ENDPOINT_DESC(ep_name, ep_id, ZB_AF_HA_PROFILE_ID,                    \
+    0,                                                                                \
+    NULL,                                                                             \
+    ZB_ZCL_ARRAY_SIZE(cluster_list, zb_zcl_cluster_desc_t), cluster_list,             \
+                          (zb_af_simple_desc_1_1_t*)&simple_desc_##ep_name,           \
+                          ZB_HA_OCCUPANCY_SENSING_REPORT_ATTR_COUNT,                  \
+                          reporting_info## device_ctx_name,                           \
+                          ZB_HA_OCCUPANCY_SENSING_CVC_ATTR_COUNT,                     \
                           cvc_alarm_info## device_ctx_name)
 
 
@@ -345,9 +352,20 @@ ZB_HA_DECLARE_DIMMABLE_LIGHT_EP(
 	HA_DIMMABLE_LIGHT_ENDPOINT,
 	dimmable_light_clusters);
 
-ZB_HA_DECLARE_DIMMABLE_LIGHT_CTX(
-	dimmable_light_ctx,
-	dimmable_light_ep);
+ZB_HA_DECLARE_OCCUPANCY_SENSING_EP(
+	occupancy_sensing_ep,
+	HA_OCCUPANCY_SENSING_ENDPOINT,
+	occupancy_sensing_clusters);
+
+// ZB_HA_DECLARE_DIMMABLE_LIGHT_CTX(
+// 	dimmable_light_ctx,
+// 	dimmable_light_ep);
+
+ZBOSS_DECLARE_DEVICE_CTX_2_EP(
+    dimmable_light_ctx,
+    dimmable_light_ep,
+    occupancy_sensing_ep
+);
 
 
 /**@brief Callback for button events.
