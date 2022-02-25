@@ -43,7 +43,9 @@
             "zigbee_error_handler.h": "c",
             "log.h": "c",
             "log_core.h": "c",
-            "soc.h": "c"
+            "soc.h": "c",
+            "gpio.h": "c",
+            "zb_zcl_on_off_addons.h": "c"
         },
         "cortex-debug.variableUseNaturalFormat": false
     }

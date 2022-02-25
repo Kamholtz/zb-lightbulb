@@ -17,10 +17,17 @@
 			pwms = < &pwm0 42 >;
 		};
 	};
+    buttons {
+        button4: button_4 {
+            gpios = < &gpio1 0xb 0x11 >;
+            label = "Presence Sensor";
+        };
+    };
 
     aliases {
 		pwm-on-board = &pwm_led3;
 		pwm-ext0 = &ext_pwm_led;
+        presence-sensor = &button4;
     };
 };
 
