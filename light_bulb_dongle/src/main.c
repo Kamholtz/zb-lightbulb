@@ -18,6 +18,8 @@
 #include <drivers/gpio.h>
 #include <settings/settings.h>
 
+#define ZB_ZCL_SUPPORT_CLUSTER_OCCUPANCY_SENSING 1
+
 #include <zboss_api.h>
 #include <zboss_api_addons.h>
 #include <zb_mem_config_med.h>
@@ -127,34 +129,6 @@
 static const struct gpio_dt_spec button = GPIO_DT_SPEC_GET_OR(PRESENCE_NODE, gpios,
 							      {0});
 static struct gpio_callback button_cb_data;
-
-
-void button_pressed(const struct device *dev, struct gpio_callback *cb,
-		    uint32_t pins)
-{
-    static enum zb_zcl_occupancy_sensing_occupancy_e occupancy_state = ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_UNOCCUPIED;
-
-    if (occupancy_state == ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_UNOCCUPIED)
-    {
-        occupancy_state = ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_OCCUPIED;
-    }
-    else
-    {
-        occupancy_state = ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_UNOCCUPIED;
-    }
-
-	printk("Button pressed at %" PRIu32 "\n", k_cycle_get_32());
-    printk("Occupancy state: %d\n", occupancy_state);
-    // LOG_INF("Occupancy state changed");
-
-	ZB_ZCL_SET_ATTRIBUTE(
-		HA_OCCUPANCY_SENSING_ENDPOINT,
-		ZB_ZCL_CLUSTER_ID_OCCUPANCY_SENSING,
-		ZB_ZCL_CLUSTER_SERVER_ROLE,
-		ZB_ZCL_ATTR_OCCUPANCY_SENSING_OCCUPANCY_ID,
-		(zb_uint8_t *)&occupancy_state,
-		ZB_FALSE);
-}
 
 
 /* Led PWM period, calculated for 50 Hz signal - in microseconds. */
@@ -562,6 +536,45 @@ static void on_off_set_value(zb_bool_t on)
 	}
 }
 
+volatile zb_bool_t toggle_occupancy_flag = false;
+
+void button_pressed(const struct device *dev, struct gpio_callback *cb,
+		    uint32_t pins)
+{
+	LOG_INF("Button pressed at %" PRIu32 "\n", k_cycle_get_32());
+    toggle_occupancy_flag = true;
+}
+
+void handle_occupancy_toggle()
+{
+    enum zb_zcl_occupancy_sensing_occupancy_e occupancy_state = dev_ctx.occupancy_sensing_attr.occupancy;
+
+    if (occupancy_state == ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_UNOCCUPIED)
+    {
+        occupancy_state = ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_OCCUPIED;
+    }
+    else
+    {
+        occupancy_state = ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_UNOCCUPIED;
+    }
+
+    LOG_INF("Occupancy state: %d\n", occupancy_state);
+
+	ZB_ZCL_SET_ATTRIBUTE(
+		HA_OCCUPANCY_SENSING_ENDPOINT,
+		ZB_ZCL_CLUSTER_ID_OCCUPANCY_SENSING,
+		ZB_ZCL_CLUSTER_SERVER_ROLE,
+		ZB_ZCL_ATTR_OCCUPANCY_SENSING_OCCUPANCY_ID,
+		(zb_uint8_t *)&occupancy_state,
+		ZB_FALSE);
+
+    LOG_INF("Setting LED based off occupancy");
+    on_off_set_value((zb_bool_t)occupancy_state);
+
+    toggle_occupancy_flag = false;
+
+}
+
 /**@brief Function for initializing all clusters attributes.
  */
 static void bulb_clusters_attr_init(void)
@@ -797,6 +810,11 @@ void main(void)
 	while (1) {
 		dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
 		k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
+
+        if (toggle_occupancy_flag)
+        {
+            handle_occupancy_toggle();
+        }
 	}
 
 }
