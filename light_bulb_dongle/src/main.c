@@ -132,7 +132,28 @@ static struct gpio_callback button_cb_data;
 void button_pressed(const struct device *dev, struct gpio_callback *cb,
 		    uint32_t pins)
 {
+    static enum zb_zcl_occupancy_sensing_occupancy_e occupancy_state = ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_UNOCCUPIED;
+
+    if (occupancy_state == ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_UNOCCUPIED)
+    {
+        occupancy_state = ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_OCCUPIED;
+    }
+    else
+    {
+        occupancy_state = ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_UNOCCUPIED;
+    }
+
 	printk("Button pressed at %" PRIu32 "\n", k_cycle_get_32());
+    printk("Occupancy state: %d\n", occupancy_state);
+    // LOG_INF("Occupancy state changed");
+
+	ZB_ZCL_SET_ATTRIBUTE(
+		HA_OCCUPANCY_SENSING_ENDPOINT,
+		ZB_ZCL_CLUSTER_ID_OCCUPANCY_SENSING,
+		ZB_ZCL_CLUSTER_SERVER_ROLE,
+		ZB_ZCL_ATTR_OCCUPANCY_SENSING_OCCUPANCY_ID,
+		(zb_uint8_t *)&occupancy_state,
+		ZB_FALSE);
 }
 
 
