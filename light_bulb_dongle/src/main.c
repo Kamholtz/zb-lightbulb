@@ -237,7 +237,8 @@ ZB_HA_DECLARE_DIMMABLE_LIGHT_EP(
 ZB_HA_DECLARE_OCCUPANCY_SENSING_EP(
 	occupancy_sensing_ep,
 	HA_OCCUPANCY_SENSING_ENDPOINT,
-	occupancy_sensing_clusters);
+	occupancy_sensing_clusters,
+    dimmable_light_ctx);
 
 // ZB_HA_DECLARE_DIMMABLE_LIGHT_CTX(
 // 	dimmable_light_ctx,

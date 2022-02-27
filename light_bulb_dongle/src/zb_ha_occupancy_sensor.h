@@ -4,6 +4,7 @@
 #include "zcl_occupancy_sensing_2.h"
 
 // Declaring a cluster list, which includes declaring multiple clusters
+// TODO: This probably shouldn't be here
 #define ZB_HA_DECLARE_OCCUPANCY_SENSING_CLUSTER_LIST(            \
   cluster_list_name,                                             \
   basic_attr_list,                                               \
@@ -45,9 +46,7 @@
 
 /*! Number of attribute for reporting on Occupancy Sensing device */
 #define ZB_HA_OCCUPANCY_SENSING_REPORT_ATTR_COUNT         \
-  (ZB_ZCL_ON_OFF_REPORT_ATTR_COUNT + ZB_ZCL_LEVEL_CONTROL_REPORT_ATTR_COUNT)
-
-#define ZB_HA_OCCUPANCY_SENSING_CVC_ATTR_COUNT 1
+  (ZB_ZCL_OCCUPANCY_SENSING_REPORT_ATTR_COUNT)
 
 /** @endcond */
 
@@ -90,22 +89,17 @@
   @param cluster_list - endpoint cluster list
  */
 /* TODO: add scenes? */
-#define ZB_HA_DECLARE_OCCUPANCY_SENSING_EP(ep_name, ep_id, cluster_list)               \
-  ZB_ZCL_DECLARE_HA_OCCUPANCY_SENSING_SIMPLE_DESC(ep_name, ep_id,                     \
-    ZB_HA_OCCUPANCY_SENSING_IN_CLUSTER_NUM, ZB_HA_OCCUPANCY_SENSING_OUT_CLUSTER_NUM); \
-  ZBOSS_DEVICE_DECLARE_REPORTING_CTX(reporting_info## device_ctx_name,                \
-                                     ZB_HA_OCCUPANCY_SENSING_REPORT_ATTR_COUNT);      \
-  ZBOSS_DEVICE_DECLARE_LEVEL_CONTROL_CTX(cvc_alarm_info## device_ctx_name,            \
-                                         ZB_HA_OCCUPANCY_SENSING_CVC_ATTR_COUNT);     \
-  ZB_AF_DECLARE_ENDPOINT_DESC(ep_name, ep_id, ZB_AF_HA_PROFILE_ID,                    \
-    0,                                                                                \
-    NULL,                                                                             \
-    ZB_ZCL_ARRAY_SIZE(cluster_list, zb_zcl_cluster_desc_t), cluster_list,             \
-                          (zb_af_simple_desc_1_1_t*)&simple_desc_##ep_name,           \
-                          ZB_HA_OCCUPANCY_SENSING_REPORT_ATTR_COUNT,                  \
-                          reporting_info## device_ctx_name,                           \
-                          ZB_HA_OCCUPANCY_SENSING_CVC_ATTR_COUNT,                     \
-                          cvc_alarm_info## device_ctx_name)
+#define ZB_HA_DECLARE_OCCUPANCY_SENSING_EP(ep_name, ep_id, cluster_list, device_ctx_name)            \
+  ZB_ZCL_DECLARE_HA_OCCUPANCY_SENSING_SIMPLE_DESC(ep_name, ep_id,                      \
+      ZB_HA_OCCUPANCY_SENSING_IN_CLUSTER_NUM, ZB_HA_OCCUPANCY_SENSING_OUT_CLUSTER_NUM); \
+  ZBOSS_DEVICE_DECLARE_REPORTING_CTX(reporting_info## device_ctx_name,          \
+                                     ZB_HA_OCCUPANCY_SENSING_REPORT_ATTR_COUNT);    \
+  ZB_AF_DECLARE_ENDPOINT_DESC(ep_name, ep_id, ZB_AF_HA_PROFILE_ID, 0, NULL, \
+    ZB_ZCL_ARRAY_SIZE(cluster_list, zb_zcl_cluster_desc_t), cluster_list,       \
+                           (zb_af_simple_desc_1_1_t*)&simple_desc_##ep_name,    \
+                           ZB_HA_OCCUPANCY_SENSING_REPORT_ATTR_COUNT,               \
+                           reporting_info## device_ctx_name, 0, NULL)
+
 
 
 #endif /* ZB_ZCL_OCCUPANCY_SENSOR_H */
