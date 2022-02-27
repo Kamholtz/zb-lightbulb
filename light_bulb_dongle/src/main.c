@@ -529,6 +529,16 @@ static void bulb_clusters_attr_init(void)
 		ZB_ZCL_ATTR_LEVEL_CONTROL_CURRENT_LEVEL_ID,
 		(zb_uint8_t *)&dev_ctx.level_control_attr.current_level,
 		ZB_FALSE);
+
+    dev_ctx.occupancy_sensing_attr.occupancy = ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_OCCUPIED;
+
+	ZB_ZCL_SET_ATTRIBUTE(
+		HA_OCCUPANCY_SENSING_ENDPOINT,
+		ZB_ZCL_CLUSTER_ID_OCCUPANCY_SENSING,
+		ZB_ZCL_CLUSTER_SERVER_ROLE,
+		ZB_ZCL_ATTR_OCCUPANCY_SENSING_OCCUPANCY_ID,
+		(zb_uint8_t *)&dev_ctx.occupancy_sensing_attr.occupancy,
+		ZB_FALSE);
 }
 
 /**@brief Callback function for handling ZCL commands.
