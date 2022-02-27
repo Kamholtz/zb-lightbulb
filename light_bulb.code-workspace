@@ -45,7 +45,10 @@
             "log_core.h": "c",
             "soc.h": "c",
             "gpio.h": "c",
-            "zb_zcl_on_off_addons.h": "c"
+            "zb_zcl_on_off_addons.h": "c",
+            "zcl_occupancy_sensing_2.h": "c",
+            "zb_zcl_occupancy_sensing.h": "c",
+            "zb_zcl_common.h": "c"
         },
         "cortex-debug.variableUseNaturalFormat": false
     }

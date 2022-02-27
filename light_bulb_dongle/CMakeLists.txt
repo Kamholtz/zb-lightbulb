@@ -13,5 +13,6 @@ project("Zigbee coordinator")
 # NORDIC SDK APP START
 target_sources(app PRIVATE
   src/main.c
+  src/zcl_occupancy_sensing.c
 )
 # NORDIC SDK APP END

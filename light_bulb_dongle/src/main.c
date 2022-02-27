@@ -18,7 +18,7 @@
 #include <drivers/gpio.h>
 #include <settings/settings.h>
 
-#define ZB_ZCL_SUPPORT_CLUSTER_OCCUPANCY_SENSING 1
+#define ZB_ZCL_SUPPORT_CLUSTER_OCCUPANCY_SENSING 1 // Likely don't need this, but keep for the meantime
 
 #include <zboss_api.h>
 #include <zboss_api_addons.h>
@@ -27,7 +27,9 @@
 #include <zigbee/zigbee_error_handler.h>
 #include <zigbee/zigbee_zcl_scenes.h>
 #include <zb_nrf_platform.h>
-#include <zb_zcl_occupancy_sensing.h>
+#include "zcl_occupancy_sensing_2.h"
+// #include <zb_zcl_occupancy_sensing.h>
+
 
 
 #define RUN_STATUS_LED                  DK_LED1
@@ -260,7 +262,7 @@ ZB_ZCL_DECLARE_OCCUPANCY_SENSING_ATTRIB_LIST(
 
 
 /*!
-  @brief Declare endpoint for Dimmable Light device
+  @brief Declare endpoint for Occupancy Sensing device
   @param ep_name - endpoint variable name
   @param ep_id - endpoint ID
   @param cluster_list - endpoint cluster list
