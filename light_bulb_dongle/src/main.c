@@ -165,11 +165,10 @@ static bulb_device_ctx_t dev_ctx;
 static const struct device *led_pwm_dev;
 static const struct device *pin_pwm_dev;
 
-ZB_ZCL_DECLARE_OCCUPANCY_SENSING_ATTRIB_LIST(
+ZB_ZCL_DECLARE_OCCUPANCY_SENSING_ATTRIB_LIST_2(
     occupancy_sensing_attr_list,
     &dev_ctx.occupancy_sensing_attr.occupancy,
     &dev_ctx.occupancy_sensing_attr.sensor_type,
-    &dev_ctx.occupancy_sensing_attr.sensor_type
 );
 
 ZB_ZCL_DECLARE_IDENTIFY_ATTRIB_LIST(

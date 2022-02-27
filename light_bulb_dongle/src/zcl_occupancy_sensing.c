@@ -18,7 +18,7 @@ void zb_zcl_occupancy_sensing_init_server()
   zb_zcl_add_cluster_handlers(ZB_ZCL_CLUSTER_ID_OCCUPANCY_SENSING,
                               ZB_ZCL_CLUSTER_SERVER_ROLE,
                               check_value_occupancy_sensing_server,
-                              zb_zcl_occupancy_sensing_write_attr_hook_server,
+                              (zb_zcl_cluster_write_attr_hook_t)NULL,
                               (zb_zcl_cluster_handler_t)NULL);
 }
 
