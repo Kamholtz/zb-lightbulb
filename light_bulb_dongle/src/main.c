@@ -455,8 +455,8 @@ void handle_occupancy_toggle()
 		(zb_uint8_t *)&occupancy_state,
 		ZB_FALSE);
 
-    LOG_INF("Setting LED based off occupancy");
-    on_off_set_value((zb_bool_t)occupancy_state);
+    // LOG_INF("Setting LED based off occupancy");
+    // on_off_set_value((zb_bool_t)occupancy_state);
 
     toggle_occupancy_flag = false;
 
