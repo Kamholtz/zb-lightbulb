@@ -50,7 +50,8 @@
             "zb_zcl_occupancy_sensing.h": "c",
             "zb_zcl_common.h": "c",
             "zboss_api_addons.h": "c",
-            "zb_zcl_occupancy_sensing_addons.h": "c"
+            "zb_zcl_occupancy_sensing_addons.h": "c",
+            "zb_zcl_on_off_switch_conf_addons.h": "c"
         },
         "cortex-debug.variableUseNaturalFormat": false
     }

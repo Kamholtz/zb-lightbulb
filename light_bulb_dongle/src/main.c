@@ -27,7 +27,9 @@
 #include <zigbee/zigbee_error_handler.h>
 #include <zigbee/zigbee_zcl_scenes.h>
 #include <zb_nrf_platform.h>
+#include <zb_zcl_on_off.h>
 #include "zb_zcl_occupancy_sensing_addons.h"
+#include "zb_zcl_on_off_switch_conf_addons.h"
 #include "zb_ha_occupancy_sensor.h"
 #include "zcl_occupancy_sensing_2.h"
 // #include <zb_zcl_occupancy_sensing.h>
@@ -155,7 +157,13 @@ typedef struct {
 	zb_zcl_groups_attrs_t            groups_attr;
 	zb_zcl_on_off_attrs_t            on_off_attr;
 	zb_zcl_level_control_attrs_t     level_control_attr;
+
     zb_zcl_occupancy_sensing_attrs_t occupancy_sensing_attr;
+
+	zb_zcl_on_off_switch_configuration_attrs_t     switch_on_off_switch_conf_attr;
+	zb_zcl_scenes_attrs_t            switch_scenes_attr;
+	zb_zcl_groups_attrs_t            switch_groups_attr;
+	zb_zcl_on_off_attrs_t            switch_on_off_attr;
 } bulb_device_ctx_t;
 
 /* Zigbee device application context storage. */
@@ -200,6 +208,46 @@ ZB_ZCL_DECLARE_BASIC_ATTRIB_LIST_EXT(
 	dev_ctx.basic_attr.location_id,
 	&dev_ctx.basic_attr.ph_env,
 	dev_ctx.basic_attr.sw_ver);
+
+// Attributes For switch
+
+ZB_ZCL_DECLARE_IDENTIFY_ATTRIB_LIST(
+	switch_client_identify_attr_list,
+	&dev_ctx.identify_attr.identify_time);
+
+ZB_ZCL_DECLARE_GROUPS_ATTRIB_LIST(
+	switch_groups_attr_list,
+	&dev_ctx.groups_attr.name_support);
+
+ZB_ZCL_DECLARE_SCENES_ATTRIB_LIST(
+	switch_scenes_attr_list,
+	&dev_ctx.scenes_attr.scene_count,
+	&dev_ctx.scenes_attr.current_scene,
+	&dev_ctx.scenes_attr.current_group,
+	&dev_ctx.scenes_attr.scene_valid,
+	&dev_ctx.scenes_attr.name_support);
+
+ZB_ZCL_DECLARE_ON_OFF_ATTRIB_LIST(
+	switch_on_off_attr_list,
+	&dev_ctx.on_off_attr.on_off);
+
+ZB_ZCL_DECLARE_ON_OFF_SWITCH_CONFIGURATION_ATTRIB_LIST(
+    switch_on_off_switch_conf_attr_list,
+    &dev_ctx.switch_on_off_switch_conf_attr.switch_type,
+    &dev_ctx.switch_on_off_switch_conf_attr.switch_actions
+);
+
+
+ZB_HA_DECLARE_ON_OFF_SWITCH_CLUSTER_LIST(
+    on_off_switch_clusters,
+    switch_on_off_switch_conf_attr_list, // on off switch config
+	identify_attr_list, // identify
+    basic_attr_list // basic
+    // switch_on_off_attr_list, // on off
+    // switch_scenes_attr_list, // scenes
+    // switch_client_identify_attr_list, // identify - need to make the client version of identify (look at cluster spec for client)
+    // switch_groups_attr_list // groups
+    );
 
 /* On/Off cluster attributes additions data */
 ZB_ZCL_DECLARE_ON_OFF_ATTRIB_LIST(
