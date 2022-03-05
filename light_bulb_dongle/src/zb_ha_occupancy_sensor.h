@@ -87,6 +87,7 @@
   @param ep_name - endpoint variable name
   @param ep_id - endpoint ID
   @param cluster_list - endpoint cluster list
+  @param device_ctx_name - device context name (to avoid name collisions)
  */
 /* TODO: add scenes? */
 #define ZB_HA_DECLARE_OCCUPANCY_SENSING_EP(ep_name, ep_id, cluster_list, device_ctx_name)            \

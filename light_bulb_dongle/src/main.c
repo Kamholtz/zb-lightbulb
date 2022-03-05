@@ -45,6 +45,9 @@
 /* Device endpoint, used to receive occupancy sensing commands. */
 #define HA_OCCUPANCY_SENSING_ENDPOINT   11
 
+/* Device endpoint, used to receive on off switch commands. */
+#define HA_ON_OFF_SWITCH_ENDPOINT   12
+
 /* Version of the application software (1 byte). */
 #define BULB_INIT_BASIC_APP_VERSION     01
 
@@ -211,25 +214,25 @@ ZB_ZCL_DECLARE_BASIC_ATTRIB_LIST_EXT(
 
 // Attributes For switch
 
-ZB_ZCL_DECLARE_IDENTIFY_ATTRIB_LIST(
-	switch_client_identify_attr_list,
-	&dev_ctx.identify_attr.identify_time);
+// ZB_ZCL_DECLARE_IDENTIFY_ATTRIB_LIST(
+// 	switch_client_identify_attr_list,
+// 	&dev_ctx.identify_attr.identify_time);
 
-ZB_ZCL_DECLARE_GROUPS_ATTRIB_LIST(
-	switch_groups_attr_list,
-	&dev_ctx.groups_attr.name_support);
+// ZB_ZCL_DECLARE_GROUPS_ATTRIB_LIST(
+// 	switch_groups_attr_list,
+// 	&dev_ctx.groups_attr.name_support);
 
-ZB_ZCL_DECLARE_SCENES_ATTRIB_LIST(
-	switch_scenes_attr_list,
-	&dev_ctx.scenes_attr.scene_count,
-	&dev_ctx.scenes_attr.current_scene,
-	&dev_ctx.scenes_attr.current_group,
-	&dev_ctx.scenes_attr.scene_valid,
-	&dev_ctx.scenes_attr.name_support);
+// ZB_ZCL_DECLARE_SCENES_ATTRIB_LIST(
+// 	switch_scenes_attr_list,
+// 	&dev_ctx.scenes_attr.scene_count,
+// 	&dev_ctx.scenes_attr.current_scene,
+// 	&dev_ctx.scenes_attr.current_group,
+// 	&dev_ctx.scenes_attr.scene_valid,
+// 	&dev_ctx.scenes_attr.name_support);
 
-ZB_ZCL_DECLARE_ON_OFF_ATTRIB_LIST(
-	switch_on_off_attr_list,
-	&dev_ctx.on_off_attr.on_off);
+// ZB_ZCL_DECLARE_ON_OFF_ATTRIB_LIST(
+// 	switch_on_off_attr_list,
+// 	&dev_ctx.on_off_attr.on_off);
 
 ZB_ZCL_DECLARE_ON_OFF_SWITCH_CONFIGURATION_ATTRIB_LIST(
     switch_on_off_switch_conf_attr_list,
@@ -287,14 +290,20 @@ ZB_HA_DECLARE_OCCUPANCY_SENSING_EP(
 	occupancy_sensing_clusters,
     dimmable_light_ctx);
 
+ZB_HA_DECLARE_ON_OFF_SWITCH_EP(
+	on_off_switch_ep,
+	HA_ON_OFF_SWITCH_ENDPOINT,
+	on_off_switch_clusters);
+
 // ZB_HA_DECLARE_DIMMABLE_LIGHT_CTX(
 // 	dimmable_light_ctx,
 // 	dimmable_light_ep);
 
-ZBOSS_DECLARE_DEVICE_CTX_2_EP(
+ZBOSS_DECLARE_DEVICE_CTX_3_EP(
     dimmable_light_ctx,
     dimmable_light_ep,
-    occupancy_sensing_ep
+    occupancy_sensing_ep,
+    on_off_switch_ep
 );
 
 
