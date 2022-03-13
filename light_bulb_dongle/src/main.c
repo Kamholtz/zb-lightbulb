@@ -489,16 +489,51 @@ void button_pressed(const struct device *dev, struct gpio_callback *cb,
     toggle_occupancy_flag = true;
 }
 
+// Context for testing purposes... should be merged with other context
+struct bulb_context {
+	zb_uint8_t     endpoint;
+	zb_uint16_t    short_addr;
+	struct k_timer find_alarm;
+};
+
+static struct bulb_context bulb_ctx;
+
+/**@brief Function for sending ON/OFF requests to the light bulb.
+ *
+ * @param[in]   bufid    Non-zero reference to Zigbee stack buffer that will be
+ *                       used to construct on/off request.
+ * @param[in]   cmd_id   ZCL command id.
+ */
+static void light_switch_send_on_off(zb_bufid_t bufid, zb_uint16_t cmd_id)
+{
+	LOG_INF("Send ON/OFF command: %d", cmd_id);
+
+	ZB_ZCL_ON_OFF_SEND_REQ(bufid,
+			       bulb_ctx.short_addr,
+			       ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
+			       bulb_ctx.endpoint,
+			       HA_ON_OFF_SWITCH_ENDPOINT,
+			       ZB_AF_HA_PROFILE_ID,
+			       ZB_ZCL_DISABLE_DEFAULT_RESPONSE,
+			       cmd_id,
+			       NULL);
+}
+
 void handle_occupancy_toggle()
 {
     enum zb_zcl_occupancy_sensing_occupancy_e occupancy_state = dev_ctx.occupancy_sensing_attr.occupancy;
 
+	zb_uint16_t cmd_id;
+    zb_ret_t zb_err_code;
+
     if (occupancy_state == ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_UNOCCUPIED)
     {
+     	cmd_id = ZB_ZCL_CMD_ON_OFF_ON_ID;
         occupancy_state = ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_OCCUPIED;
     }
     else
     {
+       	cmd_id = ZB_ZCL_CMD_ON_OFF_OFF_ID;
         occupancy_state = ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_UNOCCUPIED;
     }
 
@@ -514,6 +549,9 @@ void handle_occupancy_toggle()
 
     // LOG_INF("Setting LED based off occupancy");
     // on_off_set_value((zb_bool_t)occupancy_state);
+
+    zb_err_code = zb_buf_get_out_delayed_ext(
+        light_switch_send_on_off, cmd_id, 0);
 
     toggle_occupancy_flag = false;
 
