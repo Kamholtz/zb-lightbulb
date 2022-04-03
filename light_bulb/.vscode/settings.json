@@ -2,6 +2,6 @@
   "nrf-connect.topdir": "c:\\Users\\carlk\\ncs\\v1.8.0",
   "nrf-connect.toolchain.path": "c:\\Users\\carlk\\ncs\\v1.8.0\\toolchain",
   "nrf-connect.applications": [
-    "c:\\repos\\zb-lightbulb\\light_bulb"
+    "C:\\Users\\carlk\\repos\\zb-lightbulb\\light_bulb"
   ]
 }
