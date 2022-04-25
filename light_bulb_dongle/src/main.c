@@ -519,24 +519,49 @@ static void light_switch_send_on_off(zb_bufid_t bufid, zb_uint16_t cmd_id)
 			       NULL);
 }
 
-void handle_occupancy_toggle()
-{
-    enum zb_zcl_occupancy_sensing_occupancy_e occupancy_state = dev_ctx.occupancy_sensing_attr.occupancy;
 
+zb_uint16_t get_on_off_cmd_id(bool isOn) {
 	zb_uint16_t cmd_id;
-    zb_ret_t zb_err_code;
-
-    if (occupancy_state == ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_UNOCCUPIED)
+    if (isOn)
     {
      	cmd_id = ZB_ZCL_CMD_ON_OFF_ON_ID;
-        occupancy_state = ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_OCCUPIED;
     }
     else
     {
        	cmd_id = ZB_ZCL_CMD_ON_OFF_OFF_ID;
+    }
+
+    return cmd_id;
+}
+
+void send_on_off_cmd(bool isOn) {
+    zb_ret_t zb_err_code;
+
+    zb_uindex_t cmd_id = get_on_off_cmd_id(isOn);
+
+    // TODO: Look into why this is "delayed"
+    zb_err_code = zb_buf_get_out_delayed_ext(
+        light_switch_send_on_off, cmd_id, 0);
+}
+
+enum zb_zcl_occupancy_sensing_occupancy_e get_opposite_occupancy_state () {
+    enum zb_zcl_occupancy_sensing_occupancy_e occupancy_state = dev_ctx.occupancy_sensing_attr.occupancy;
+
+    // Toggle
+    if (occupancy_state == ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_UNOCCUPIED)
+    {
+        occupancy_state = ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_OCCUPIED;
+    }
+    else
+    {
         occupancy_state = ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_UNOCCUPIED;
     }
 
+    return occupancy_state;
+}
+
+void set_occupancy_attr(enum zb_zcl_occupancy_sensing_occupancy_e occupancy_state)
+{
     LOG_INF("Occupancy state: %d\n", occupancy_state);
 
 	ZB_ZCL_SET_ATTRIBUTE(
@@ -549,12 +574,6 @@ void handle_occupancy_toggle()
 
     // LOG_INF("Setting LED based off occupancy");
     // on_off_set_value((zb_bool_t)occupancy_state);
-
-    zb_err_code = zb_buf_get_out_delayed_ext(
-        light_switch_send_on_off, cmd_id, 0);
-
-    toggle_occupancy_flag = false;
-
 }
 
 /**@brief Function for initializing all clusters attributes.
@@ -799,13 +818,19 @@ void main(void)
 
 	LOG_INF("ZBOSS Light Bulb example started");
 
+
 	while (1) {
 		dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
 		k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
 
         if (toggle_occupancy_flag)
         {
-            handle_occupancy_toggle();
+            enum zb_zcl_occupancy_sensing_occupancy_e occupancy_state = get_opposite_occupancy_state();
+            bool buttonCmdState = occupancy_state == ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_OCCUPIED;
+
+            send_on_off_cmd(buttonCmdState);
+            set_occupancy_attr(occupancy_state);
+            toggle_occupancy_flag = false;
         }
 	}
 
