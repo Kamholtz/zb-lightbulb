@@ -754,21 +754,8 @@ void zboss_signal_handler(zb_bufid_t bufid)
 	}
 }
 
-void main(void)
-{
-	int blink_status = 0;
-	int err;
+void init_button(void) {
 
-	LOG_INF("Starting ZBOSS Light Bulb example");
-
-	/* Initialize */
-	configure_gpio();
-	err = settings_subsys_init();
-	if (err) {
-		LOG_ERR("settings initialization failed");
-	}
-
-    // Button interrupt - to become prescence sensor
     int ret;
 	if (!device_is_ready(button.port)) {
 		printk("Error: button device %s is not ready\n",
@@ -796,6 +783,24 @@ void main(void)
 	printk("Set up button at %s pin %d\n", button.port->name, button.pin);
 
 	printk("Press the button\n");
+}
+
+void main(void)
+{
+	int blink_status = 0;
+	int err;
+
+	LOG_INF("Starting ZBOSS Light Bulb example");
+
+	/* Initialize */
+	configure_gpio();
+	err = settings_subsys_init();
+	if (err) {
+		LOG_ERR("settings initialization failed");
+	}
+
+    // Button interrupt - to become prescence sensor
+    init_button();
     // Button end
 
 
