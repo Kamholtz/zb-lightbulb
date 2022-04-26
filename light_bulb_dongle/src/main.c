@@ -135,8 +135,7 @@
 #error "Unsupported board: presence_sensor devicetree alias is not defined"
 #endif
 
-static const struct gpio_dt_spec button = GPIO_DT_SPEC_GET_OR(PRESENCE_NODE, gpios,
-							      {0});
+static const struct gpio_dt_spec button = GPIO_DT_SPEC_GET_OR(PRESENCE_NODE, gpios, {0});
 static struct gpio_callback button_cb_data;
 
 
@@ -544,6 +543,14 @@ void send_on_off_cmd(bool isOn) {
         light_switch_send_on_off, cmd_id, 0);
 }
 
+void send_on_off_toggle_cmd() {
+    zb_ret_t zb_err_code;
+
+    // TODO: Look into why this is "delayed"
+    zb_err_code = zb_buf_get_out_delayed_ext(
+        light_switch_send_on_off, ZB_ZCL_CMD_ON_OFF_TOGGLE_ID, 0);
+}
+
 enum zb_zcl_occupancy_sensing_occupancy_e get_opposite_occupancy_state () {
     enum zb_zcl_occupancy_sensing_occupancy_e occupancy_state = dev_ctx.occupancy_sensing_attr.occupancy;
 
@@ -828,7 +835,8 @@ void main(void)
             enum zb_zcl_occupancy_sensing_occupancy_e occupancy_state = get_opposite_occupancy_state();
             bool buttonCmdState = occupancy_state == ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_OCCUPIED;
 
-            send_on_off_cmd(buttonCmdState);
+            // send_on_off_cmd(buttonCmdState);
+            send_on_off_toggle_cmd();
             set_occupancy_attr(occupancy_state);
             toggle_occupancy_flag = false;
         }
