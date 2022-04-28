@@ -11,26 +11,32 @@
 
 	buttons {
 		compatible = "gpio-keys";
-		rst_button0: rst_button_0 {
-			gpios = <&gpio0 19 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		rst_button0: rst_button_0 { // Dongle docs indicates that the reset button is attached to P0.18, but it is connected to other pins too, including P0.19
+			gpios = <&gpio0 19 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>; // P0.19
 			label = "Reset button";
 		};
+        ext_button0: ext_button_0 {
+            // gpios = <&gpio0 29 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+            gpios = <&gpio1 0x06 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>; // P1.06
+            label = "External button 0";
+        };
 	};
 
     pwmleds {
 		ext_pwm_led: pwm_led_3 {
-			pwms = < &pwm0 42 >;
+			pwms = < &pwm0 42 >; // P1.10
 		};
     };
 
 	aliases {
-		rst0 = &rst_button0;
         pwm-on-board = &blue_pwm_led;
         pwm-ext0 = &ext_pwm_led;
+        presence-sensor = &ext_button0;
+		rst0 = &rst_button0;
 	};
 };
 
 &pwm0 {
-    ch3-pin = < 42 >;
+    ch3-pin = < 42 >; // P1.10
     ch3-inverted;
 };

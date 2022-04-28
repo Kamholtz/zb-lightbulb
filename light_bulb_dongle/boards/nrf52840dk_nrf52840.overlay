@@ -11,15 +11,15 @@
 
 	pwmleds {
 		pwm_led3: pwm_led_3 {
-			pwms = <&pwm0 16>;
+			pwms = <&pwm0 16>; // P0.06
 		};
 		ext_pwm_led: pwm_led_4 {
-			pwms = < &pwm0 42 >;
+			pwms = < &pwm0 42 >; // P1.10
 		};
 	};
     buttons {
         button4: button_4 {
-            gpios = < &gpio1 0xb 0x11 >;
+            gpios = < &gpio1 0xb 0x11 >; // P0.11
             label = "Presence Sensor";
         };
     };
