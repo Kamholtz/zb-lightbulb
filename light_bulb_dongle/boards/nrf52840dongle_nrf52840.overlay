@@ -15,11 +15,11 @@
 			gpios = <&gpio0 19 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>; // P0.19
 			label = "Reset button";
 		};
-        ext_button0: ext_button_0 {
-            // gpios = <&gpio0 29 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
-            gpios = <&gpio1 0x06 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>; // P1.06
-            label = "External button 0";
-        };
+        // ext_button0: ext_button_0 {
+        //     // gpios = <&gpio0 29 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+        //     gpios = <&gpio1 0x06 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>; // P1.06
+        //     label = "External button 0";
+        // };
 	};
 
     pwmleds {
@@ -31,7 +31,8 @@
 	aliases {
         pwm-on-board = &blue_pwm_led;
         pwm-ext0 = &ext_pwm_led;
-        presence-sensor = &ext_button0;
+        presence-sensor = &button0;
+        // button-press-pwm-led = &red_pwm_led;
 		rst0 = &rst_button0;
 	};
 };
