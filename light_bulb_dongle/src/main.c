@@ -400,7 +400,7 @@ static void light_bulb_set_brightness(zb_uint8_t brightness_level)
  */
 static void external_light_bulb_set_brightness(zb_uint8_t brightness_level)
 {
-	uint32_t pulse = brightness_level * LED_PWM_PERIOD_US / 255U;
+	uint32_t pulse = (255U - brightness_level) * LED_PWM_PERIOD_US / 255U;
 
 	if (pwm_pin_set_usec(pin_pwm_dev, PWM_PIN_CHANNEL,
 			     LED_PWM_PERIOD_US, pulse, PWM_PIN_FLAGS)) {
