@@ -831,12 +831,17 @@ void main(void)
 	LOG_INF("ZBOSS Light Bulb example started");
 
 
+    int button_press_state = 0;
+
+
 	while (1) {
 		dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
 		k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
 
         if (toggle_occupancy_flag)
         {
+		    dk_set_led(DK_LED2, (++button_press_state) % 2);
+
             enum zb_zcl_occupancy_sensing_occupancy_e occupancy_state = get_opposite_occupancy_state();
             bool buttonCmdState = occupancy_state == ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_OCCUPIED;
 
@@ -844,6 +849,8 @@ void main(void)
             send_on_off_toggle_cmd();
             set_occupancy_attr(occupancy_state);
             toggle_occupancy_flag = false;
+
+            zb_bdb_reset_via_local_action(0);
         }
 	}
 
