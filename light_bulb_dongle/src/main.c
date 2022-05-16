@@ -37,7 +37,7 @@
 
 
 #define RUN_STATUS_LED                  DK_LED1
-#define RUN_LED_BLINK_INTERVAL          1000
+#define RUN_LED_BLINK_INTERVAL          50
 
 /* Device endpoint, used to receive light controlling commands. */
 #define HA_DIMMABLE_LIGHT_ENDPOINT      10
@@ -61,7 +61,7 @@
 #define BULB_INIT_BASIC_MANUF_NAME      "Nordic"
 
 /* Model number assigned by manufacturer (32-bytes long string). */
-#define BULB_INIT_BASIC_MODEL_ID        "Dimable_Light_v0.2"
+#define BULB_INIT_BASIC_MODEL_ID        "Dimable_Light_v0.1"
 
 /* First 8 bytes specify the date of manufacturer of the device
  * in ISO 8601 format (YYYYMMDD). The rest (8 bytes) are manufacturer specific.
@@ -484,7 +484,7 @@ volatile zb_bool_t toggle_occupancy_flag = false;
 void button_pressed(const struct device *dev, struct gpio_callback *cb,
 		    uint32_t pins)
 {
-	LOG_INF("Button pressed at %" PRIu32 "\n", k_cycle_get_32());
+	// LOG_INF("Button pressed at %" PRIu32 "\n", k_cycle_get_32());
     toggle_occupancy_flag = true;
 }
 
@@ -785,6 +785,10 @@ void init_button(void) {
 	printk("Press the button\n");
 }
 
+bool is_button_pressed(void) {
+    return gpio_pin_get(button.port, button.pin);
+}
+
 void main(void)
 {
 	int blink_status = 0;
@@ -834,24 +838,78 @@ void main(void)
     int button_press_state = 0;
 
 
+    bool button_is_pressed = false;
+    bool debounce_is_pressed = false;
+    int press_timer = 0;
+    int debounce_timer = 0;
+
+
+    int loop_count = 0;
+    const int blink_toggle = (1000/RUN_LED_BLINK_INTERVAL);
+
 	while (1) {
-		dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
+
+		dk_set_led(RUN_STATUS_LED, (blink_status) % 2);
+        if (loop_count % blink_toggle == 0) {
+            blink_status++;
+        }
+        loop_count++;
+
 		k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
 
-        if (toggle_occupancy_flag)
-        {
-		    dk_set_led(DK_LED2, (++button_press_state) % 2);
+        button_is_pressed = is_button_pressed();
 
-            enum zb_zcl_occupancy_sensing_occupancy_e occupancy_state = get_opposite_occupancy_state();
-            bool buttonCmdState = occupancy_state == ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_OCCUPIED;
-
-            // send_on_off_cmd(buttonCmdState);
-            send_on_off_toggle_cmd();
-            set_occupancy_attr(occupancy_state);
-            toggle_occupancy_flag = false;
-
-            zb_bdb_reset_via_local_action(0);
+        if (button_is_pressed != debounce_is_pressed) {
+            // Increment when there is a difference
+            debounce_timer += RUN_LED_BLINK_INTERVAL;
         }
+
+        if (button_is_pressed == debounce_is_pressed) {
+            // Reset timer
+            debounce_timer = 0;
+        }
+
+        if (debounce_is_pressed) {
+            press_timer += RUN_LED_BLINK_INTERVAL;
+        }
+
+        if (debounce_timer > 250) { // > 50ms
+            // debounce time surpassed, debounced state change
+            debounce_is_pressed = button_is_pressed;
+            LOG_INF("Debounced");
+
+            if (button_is_pressed == false) {
+                // Rising edge/finger lifted
+                if (press_timer > 5000) {
+                    // action for 5 second press
+                    LOG_INF("5 second button press");
+                } else if (press_timer > 1000) { // > 1000ms
+                    // action for 1 second press
+                    LOG_INF("1 second button press");
+                } else {
+                    // action for momentary press
+                    LOG_INF("Momentary button press");
+                }
+
+                press_timer = 0;
+            }
+        }
+
+
+        // if (toggle_occupancy_flag)
+        // {
+		//     dk_set_led(DK_LED2, (++button_press_state) % 2);
+
+        //     enum zb_zcl_occupancy_sensing_occupancy_e occupancy_state = get_opposite_occupancy_state();
+        //     bool buttonCmdState = occupancy_state == ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_OCCUPIED;
+
+        //     // send_on_off_cmd(buttonCmdState);
+        //     send_on_off_toggle_cmd();
+        //     set_occupancy_attr(occupancy_state);
+        //     toggle_occupancy_flag = false;
+
+        //     zb_bdb_reset_via_local_action(0);
+        // }
 	}
 
 }
