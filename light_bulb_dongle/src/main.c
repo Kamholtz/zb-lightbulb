@@ -37,7 +37,7 @@
 
 
 #define RUN_STATUS_LED                  DK_LED1
-#define RUN_LED_BLINK_INTERVAL          50
+#define RUN_LED_BLINK_INTERVAL          25
 
 /* Device endpoint, used to receive light controlling commands. */
 #define HA_DIMMABLE_LIGHT_ENDPOINT      10
@@ -846,6 +846,8 @@ void main(void)
 
     int loop_count = 0;
     const int blink_toggle = (1000/RUN_LED_BLINK_INTERVAL);
+    const uint8_t level_control_inc = UINT8_MAX/3;
+    uint8_t level_control_value = 0;
 
 	while (1) {
 
@@ -873,7 +875,7 @@ void main(void)
             press_timer += RUN_LED_BLINK_INTERVAL;
         }
 
-        if (debounce_timer > 250) { // > 50ms
+        if (debounce_timer > 100) { // > 100ms
             // debounce time surpassed, debounced state change
             debounce_is_pressed = button_is_pressed;
             LOG_INF("Debounced");
@@ -889,6 +891,13 @@ void main(void)
                 } else {
                     // action for momentary press
                     LOG_INF("Momentary button press");
+
+                    if (level_control_value == UINT8_MAX) {
+                        level_control_value = 0;
+                    } else {
+                        level_control_value += level_control_inc;
+                    }
+                    level_control_set_value(level_control_value);
                 }
 
                 press_timer = 0;
