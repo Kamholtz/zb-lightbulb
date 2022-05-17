@@ -892,6 +892,8 @@ void main(void)
                     // action for momentary press
                     LOG_INF("Momentary button press");
 
+                    level_control_value = ((int)(dev_ctx.level_control_attr.current_level/level_control_inc)) * level_control_inc;
+
                     if (level_control_value == UINT8_MAX) {
                         level_control_value = 0;
                     } else {
