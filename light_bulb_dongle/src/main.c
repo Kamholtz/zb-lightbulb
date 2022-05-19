@@ -851,6 +851,7 @@ void main(void)
 
 	while (1) {
 
+        // Status LED
 		dk_set_led(RUN_STATUS_LED, (blink_status) % 2);
         if (loop_count % blink_toggle == 0) {
             blink_status++;
@@ -859,6 +860,7 @@ void main(void)
 
 		k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
 
+        // Button press + debounce + handlers
         button_is_pressed = is_button_pressed();
 
         if (button_is_pressed != debounce_is_pressed) {
