@@ -1,7 +1,7 @@
 #ifndef ZB_ZCL_OCCUPANCY_SENSOR_H
 #define ZB_ZCL_OCCUPANCY_SENSOR_H 1
 
-#include "zcl_occupancy_sensing_2.h"
+#include <zb_zcl_occupancy_sensing.h>
 
 // Declaring a cluster list, which includes declaring multiple clusters
 // TODO: This probably shouldn't be here

@@ -19,6 +19,7 @@
 #include <settings/settings.h>
 
 #define ZB_ZCL_SUPPORT_CLUSTER_OCCUPANCY_SENSING 1 // Likely don't need this, but keep for the meantime
+// #define ZB_HA_DEFINE_DEVICE_ON_OFF_SWITCH
 
 #include <zboss_api.h>
 #include <zboss_api_addons.h>
@@ -26,12 +27,15 @@
 #include <zigbee/zigbee_app_utils.h>
 #include <zigbee/zigbee_error_handler.h>
 #include <zigbee/zigbee_zcl_scenes.h>
+// #include <zb_zcl_occupancy_sensing.h>
 #include <zb_nrf_platform.h>
 #include <zb_zcl_on_off.h>
 #include "zb_zcl_occupancy_sensing_addons.h"
 #include "zb_zcl_on_off_switch_conf_addons.h"
 #include "zb_ha_occupancy_sensor.h"
 #include "zcl_occupancy_sensing_2.h"
+#include "zb_dimmable_light.h"
+#include "zb_ha_on_off_switch.h"
 // #include <zb_zcl_occupancy_sensing.h>
 
 
@@ -175,11 +179,12 @@ static bulb_device_ctx_t dev_ctx;
 static const struct device *led_pwm_dev;
 static const struct device *pin_pwm_dev;
 
-ZB_ZCL_DECLARE_OCCUPANCY_SENSING_ATTRIB_LIST_2(
-    occupancy_sensing_attr_list,
-    &dev_ctx.occupancy_sensing_attr.occupancy,
-    &dev_ctx.occupancy_sensing_attr.sensor_type,
-);
+// ZB_ZCL_DECLARE_OCCUPANCY_SENSING_ATTRIB_LIST(
+//     occupancy_sensing_attr_list,
+//     &dev_ctx.occupancy_sensing_attr.occupancy,
+//     &dev_ctx.occupancy_sensing_attr.sensor_type,
+//     &dev_ctx.occupancy_sensing_attr.bitmap
+// );
 
 ZB_ZCL_DECLARE_IDENTIFY_ATTRIB_LIST(
     identify_attr_list,
@@ -261,7 +266,7 @@ ZB_ZCL_DECLARE_LEVEL_CONTROL_ATTRIB_LIST(
     &dev_ctx.level_control_attr.current_level,
     &dev_ctx.level_control_attr.remaining_time);
 
-ZB_HA_DECLARE_DIMMABLE_LIGHT_CLUSTER_LIST(
+ZB_DECLARE_DIMMABLE_LIGHT_CLUSTER_LIST(
     dimmable_light_clusters,
     basic_attr_list,
     identify_attr_list,
@@ -271,23 +276,23 @@ ZB_HA_DECLARE_DIMMABLE_LIGHT_CLUSTER_LIST(
     level_control_attr_list);
 
 
-ZB_HA_DECLARE_OCCUPANCY_SENSING_CLUSTER_LIST(
-    occupancy_sensing_clusters,
-    basic_attr_list,
-    identify_attr_list,
-    occupancy_sensing_attr_list);
+// ZB_HA_DECLARE_OCCUPANCY_SENSING_CLUSTER_LIST(
+//     occupancy_sensing_clusters,
+//     basic_attr_list,
+//     identify_attr_list,
+//     occupancy_sensing_attr_list);
 
 
-ZB_HA_DECLARE_DIMMABLE_LIGHT_EP(
+ZB_DECLARE_DIMMABLE_LIGHT_EP(
     dimmable_light_ep,
     HA_DIMMABLE_LIGHT_ENDPOINT,
     dimmable_light_clusters);
 
-ZB_HA_DECLARE_OCCUPANCY_SENSING_EP(
-    occupancy_sensing_ep,
-    HA_OCCUPANCY_SENSING_ENDPOINT,
-    occupancy_sensing_clusters,
-    dimmable_light_ctx);
+// ZB_HA_DECLARE_OCCUPANCY_SENSING_EP(
+//     occupancy_sensing_ep,
+//     HA_OCCUPANCY_SENSING_ENDPOINT,
+//     occupancy_sensing_clusters,
+//     dimmable_light_ctx);
 
 ZB_HA_DECLARE_ON_OFF_SWITCH_EP(
     on_off_switch_ep,
@@ -298,10 +303,9 @@ ZB_HA_DECLARE_ON_OFF_SWITCH_EP(
 // 	dimmable_light_ctx,
 // 	dimmable_light_ep);
 
-ZBOSS_DECLARE_DEVICE_CTX_3_EP(
+ZBOSS_DECLARE_DEVICE_CTX_2_EP(
     dimmable_light_ctx,
     dimmable_light_ep,
-    occupancy_sensing_ep,
     on_off_switch_ep
 );
 
@@ -653,13 +657,13 @@ static void bulb_clusters_attr_init(void)
 
     dev_ctx.occupancy_sensing_attr.occupancy = ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_OCCUPIED;
 
-    ZB_ZCL_SET_ATTRIBUTE(
-        HA_OCCUPANCY_SENSING_ENDPOINT,
-        ZB_ZCL_CLUSTER_ID_OCCUPANCY_SENSING,
-        ZB_ZCL_CLUSTER_SERVER_ROLE,
-        ZB_ZCL_ATTR_OCCUPANCY_SENSING_OCCUPANCY_ID,
-        (zb_uint8_t *)&dev_ctx.occupancy_sensing_attr.occupancy,
-        ZB_FALSE);
+    // ZB_ZCL_SET_ATTRIBUTE(
+    //     HA_OCCUPANCY_SENSING_ENDPOINT,
+    //     ZB_ZCL_CLUSTER_ID_OCCUPANCY_SENSING,
+    //     ZB_ZCL_CLUSTER_SERVER_ROLE,
+    //     ZB_ZCL_ATTR_OCCUPANCY_SENSING_OCCUPANCY_ID,
+    //     (zb_uint8_t *)&dev_ctx.occupancy_sensing_attr.occupancy,
+    //     ZB_FALSE);
 }
 
 /**@brief Callback function for handling ZCL commands.
