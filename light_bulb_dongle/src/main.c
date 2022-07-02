@@ -759,7 +759,7 @@ uint8_t get_zb_network_status_led_state(zb_zdo_app_signal_type_t sig, zb_ret_t s
 		break;
 	}
 
-    printk("app_sig: %d, app_sig_status: %d, get_zb_network_status_led_state: %d\n", g_app_sig, g_app_sig_status, led_state);
+    // printk("app_sig: %d, app_sig_status: %d, get_zb_network_status_led_state: %d\n", g_app_sig, g_app_sig_status, led_state);
     return led_state;
 }
 
