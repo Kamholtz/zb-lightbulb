@@ -815,16 +815,16 @@ void init_button(void) {
         return;
     }
 
-    ret = gpio_pin_interrupt_configure_dt(&button,
-                          GPIO_INT_EDGE_TO_ACTIVE);
-    if (ret != 0) {
-        printk("Error %d: failed to configure interrupt on %s pin %d\n",
-            ret, button.port->name, button.pin);
-        return;
-    }
+    // ret = gpio_pin_interrupt_configure_dt(&button,
+    //                       GPIO_INT_EDGE_TO_ACTIVE);
+    // if (ret != 0) {
+    //     printk("Error %d: failed to configure interrupt on %s pin %d\n",
+    //         ret, button.port->name, button.pin);
+    //     return;
+    // }
 
-    gpio_init_callback(&button_cb_data, button_pressed, BIT(button.pin));
-    gpio_add_callback(button.port, &button_cb_data);
+    // gpio_init_callback(&button_cb_data, button_pressed, BIT(button.pin));
+    // gpio_add_callback(button.port, &button_cb_data);
     printk("Set up button at %s pin %d\n", button.port->name, button.pin);
 
     printk("Press the button\n");
