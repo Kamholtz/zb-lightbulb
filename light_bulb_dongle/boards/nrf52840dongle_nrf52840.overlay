@@ -41,3 +41,9 @@
     ch3-pin = < 42 >; // P1.10
     ch3-inverted;
 };
+
+&pwm0 {
+	pinctrl-0 = <&pwm0_default_alt>;
+	pinctrl-1 = <&pwm0_sleep_alt>;
+	pinctrl-names = "default", "sleep";
+};
