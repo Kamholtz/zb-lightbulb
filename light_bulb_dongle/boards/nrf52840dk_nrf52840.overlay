@@ -49,13 +49,9 @@
  	pwm0_default_alt: pwm0_default_alt {
 		group1 {
         // I think the items in psels need to be replicated in pwm0_sleep_alt and vice versa. Both bins should have a sleep and non sleep state defined
-			psels = <NRF_PSEL(PWM_OUT1, 0, 16)>; // P0.16 - DK LED4
+			psels = <NRF_PSEL(PWM_OUT1, 0, 16)>, // P0.16 - DK LED4
+                    <NRF_PSEL(PWM_OUT2, 0, 42)>; // P1.10 - external
 			nordic,invert;
-		};
-
-		group2 {
-        // I think the items in psels need to be replicated in pwm0_sleep_alt and vice versa. Both bins should have a sleep and non sleep state defined
-			psels = <NRF_PSEL(PWM_OUT2, 0, 42)>; // P1.10 - external
 		};
 	};
 
@@ -64,7 +60,6 @@
 			psels = <NRF_PSEL(PWM_OUT1, 0, 16)>, // P0.16 - DK LED4
                     <NRF_PSEL(PWM_OUT2, 0, 42)>; // P1.10 - external
 			low-power-enable;
-			// nordic,invert;
 		};
 	};
 
