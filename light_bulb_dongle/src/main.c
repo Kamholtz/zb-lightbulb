@@ -127,6 +127,7 @@
  */
 #define PWM_PIN_NODE                DT_NODELABEL(ext_pwm_led)
 
+// TODO: the #if check should be on PWM_PIN_NODE, not PWM_DK_LED4_NODE
 #if DT_NODE_HAS_STATUS(PWM_DK_LED4_NODE, okay)
 /* Get the defines from overlay file. */
 #define PWM_PIN_CTLR                DT_PWMS_CTLR(PWM_PIN_NODE)
