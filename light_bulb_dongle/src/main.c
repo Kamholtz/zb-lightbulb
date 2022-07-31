@@ -38,7 +38,7 @@
 #include "zb_ha_on_off_switch.h"
 // #include <zb_zcl_occupancy_sensing.h>
 
-// #define INCLUDE_DONGLE_USB_LOGGING 1
+// #define INCLUDE_DONGLE_USB_LOGGING 1 // If this is uncommented, USB output will be enabled. In its current state, it only transmits what it receives. It is still a POC for eventually setting up USB logging backend of the dongle
 #ifdef INCLUDE_DONGLE_USB_LOGGING
 #include "usb_logging.h"
 #endif
