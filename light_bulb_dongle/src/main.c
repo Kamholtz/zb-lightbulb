@@ -68,7 +68,8 @@
 #define BULB_INIT_BASIC_MANUF_NAME      "Nordic"
 
 /* Model number assigned by manufacturer (32-bytes long string). */
-#define BULB_INIT_BASIC_MODEL_ID        "Dimable_Light_v0.1"
+#define BULB_INIT_BASIC_MODEL_ID        "Dimable_Light_v0.1" // DK
+// #define BULB_INIT_BASIC_MODEL_ID        "Dimable_Light_v0.1" // Dongle
 
 /* First 8 bytes specify the date of manufacturer of the device
  * in ISO 8601 format (YYYYMMDD). The rest (8 bytes) are manufacturer specific.
