@@ -38,6 +38,16 @@
 	};
 };
 
+// START - USB LOGGING ON DONGLE
+&zephyr_udc0 {
+	cdc_acm_uart0 {
+		compatible = "zephyr,cdc-acm-uart";
+		label = "CDC_ACM_0";
+	};
+};
+// END - USB LOGGING ON DONGLE
+
+
 // &pwm0 {
 //     ch3-pin = < 42 >; // P1.10
 //     ch3-inverted;
