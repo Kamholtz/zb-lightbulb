@@ -63,3 +63,12 @@
 	};
 
 };
+
+// This USB mode is only here so that it can be found in the usb_logging module. I was not sure how to get it working otherwise
+&zephyr_udc0 {
+	cdc_acm_uart0 {
+		compatible = "zephyr,cdc-acm-uart";
+		label = "CDC_ACM_0";
+        // status = "okay";
+	};
+};

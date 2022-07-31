@@ -43,6 +43,7 @@
 	cdc_acm_uart0 {
 		compatible = "zephyr,cdc-acm-uart";
 		label = "CDC_ACM_0";
+        // status = "okay";
 	};
 };
 // END - USB LOGGING ON DONGLE
