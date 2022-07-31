@@ -49,20 +49,26 @@
 	pinctrl-names = "default", "sleep";
 };
 
+
+			// pwms = < &pwm0 42 >; // P1.10
 &pinctrl {
 	pwm0_default_alt: pwm0_default_alt {
 		group1 {
-			psels = <NRF_PSEL(PWM_OUT1, 0, 16)>;
+			psels = <NRF_PSEL(PWM_OUT0, 0, 8)>,
+				<NRF_PSEL(PWM_OUT1, 1, 9)>,
+				<NRF_PSEL(PWM_OUT2, 0, 12)>,
+				<NRF_PSEL(PWM_OUT3, 1, 10)>;
 			nordic,invert;
 		};
 	};
 
 	pwm0_sleep_alt: pwm0_sleep_alt {
 		group1 {
-			psels = <NRF_PSEL(PWM_OUT1, 0, 42)>;
-			// low-power-enable;
-			nordic,invert;
+			psels = <NRF_PSEL(PWM_OUT0, 0, 8)>,
+				<NRF_PSEL(PWM_OUT1, 1, 9)>,
+				<NRF_PSEL(PWM_OUT2, 0, 12)>,
+				<NRF_PSEL(PWM_OUT3, 1, 10)>;
+			low-power-enable;
 		};
 	};
-
 };

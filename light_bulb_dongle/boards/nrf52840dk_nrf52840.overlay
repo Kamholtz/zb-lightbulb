@@ -45,8 +45,10 @@
 
 
 &pinctrl {
-	pwm0_default_alt: pwm0_default_alt {
+    // The `alt` in the name is referring to this pinctrl being an alternative to the `pwm0_default` in the base device tree for the nrf52840 DK
+ 	pwm0_default_alt: pwm0_default_alt {
 		group1 {
+        // I think the items in psels need to be replicated in pwm0_sleep_alt and vice versa. Both bins should have a sleep and non sleep state defined
 			psels = <NRF_PSEL(PWM_OUT1, 0, 16)>;
 			nordic,invert;
 		};
