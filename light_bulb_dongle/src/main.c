@@ -68,7 +68,7 @@
 #define BULB_INIT_BASIC_MANUF_NAME      "Nordic"
 
 /* Model number assigned by manufacturer (32-bytes long string). */
-#define BULB_INIT_BASIC_MODEL_ID        "Dimable_Light_v0.2"
+#define BULB_INIT_BASIC_MODEL_ID        "Dimable_Light_v0.1"
 
 /* First 8 bytes specify the date of manufacturer of the device
  * in ISO 8601 format (YYYYMMDD). The rest (8 bytes) are manufacturer specific.
@@ -150,9 +150,9 @@ static struct gpio_callback button_cb_data;
 /* Led PWM period, calculated for 50 Hz signal - in microseconds. */
 #define LED_PWM_PERIOD_US               (USEC_PER_SEC / 25000U)
 
-#ifndef ZB_ROUTER_ROLE
-#error Define ZB_ROUTER_ROLE to compile router source code.
-#endif
+// #ifndef ZB_ROUTER_ROLE
+// #error Define ZB_ROUTER_ROLE to compile router source code.
+// #endif
 
 LOG_MODULE_REGISTER(app, LOG_LEVEL_INF);
 
