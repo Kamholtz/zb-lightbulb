@@ -38,7 +38,10 @@
 #include "zb_ha_on_off_switch.h"
 // #include <zb_zcl_occupancy_sensing.h>
 
+// #define INCLUDE_DONGLE_USB_LOGGING 1
+#ifdef INCLUDE_DONGLE_USB_LOGGING
 #include "usb_logging.h"
+#endif
 
 #define RUN_STATUS_LED                  DK_LED1
 #define RUN_LED_BLINK_INTERVAL          25
@@ -875,7 +878,9 @@ void main(void)
     }
 
     // START - USB logging on dongle
+#ifdef INCLUDE_DONGLE_USB_LOGGING
     usb_logging_init();
+#endif
     // END - USB logging on dongle
 
     /* Start Zigbee default thread */
