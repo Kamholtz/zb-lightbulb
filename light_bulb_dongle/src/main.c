@@ -840,16 +840,6 @@ bool is_button_pressed(void) {
     return gpio_pin_get(button.port, button.pin);
 }
 
-struct Button_Press_Handler {
-    struct gpio_dt_spec gpio;
-    int press_timer_ms;
-    int debounce_timer_ms;
-    // int poll_interval_ms;
-    int* time_thresh;
-    int completed_button_press_thresh;
-    bool press_handled;
-}
-
 void main(void)
 {
     int blink_status = 0;
