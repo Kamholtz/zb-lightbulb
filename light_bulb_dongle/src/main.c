@@ -36,6 +36,7 @@
 #include "zcl_occupancy_sensing_2.h"
 #include "zb_dimmable_light.h"
 #include "zb_ha_on_off_switch.h"
+#include "button_press_handler/button_press_handler.h"
 // #include <zb_zcl_occupancy_sensing.h>
 
 // #define INCLUDE_DONGLE_USB_LOGGING 1 // If this is uncommented, USB output will be enabled. In its current state, it only transmits what it receives. It is still a POC for eventually setting up USB logging backend of the dongle
@@ -839,6 +840,16 @@ bool is_button_pressed(void) {
     return gpio_pin_get(button.port, button.pin);
 }
 
+struct Button_Press_Handler {
+    struct gpio_dt_spec gpio;
+    int press_timer_ms;
+    int debounce_timer_ms;
+    // int poll_interval_ms;
+    int* time_thresh;
+    int completed_button_press_thresh;
+    bool press_handled;
+}
+
 void main(void)
 {
     int blink_status = 0;
@@ -904,6 +915,14 @@ void main(void)
     const int blink_toggle = (1000/RUN_LED_BLINK_INTERVAL);
     const uint8_t level_control_inc = UINT8_MAX/3;
     uint8_t level_control_value = 0;
+
+    // struct Button_Press_Handler button_press_handler[1];
+    // button_press_handler[0].gpio = button;
+    // button_press_handler[0].press_timer_ms = 0;
+    // button_press_handler[0].debounce_timer_ms = 0;
+    // button_press_handler[0].time_thresh = 0;
+    // button_press_handler[0].completed_button_press_thresh = 0;
+
 
     while (1) {
 

@@ -36,7 +36,8 @@
             "zb_zcl_occupancy_sensing_addons.h": "c",
             "zb_zcl_on_off_switch_conf_addons.h": "c",
             "zb_dimmable_light.h": "c",
-            "zb_ha_on_off_switch.h": "c"
+            "zb_ha_on_off_switch.h": "c",
+            "types.h": "c"
         },
         "cortex-debug.variableUseNaturalFormat": false
     }
