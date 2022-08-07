@@ -14,7 +14,7 @@ struct Button_Press_Handler get_button_press_handler(struct gpio_dt_spec button)
 
 bool is_button_pressed(struct gpio_dt_spec gpio) {
     // return gpio_pin_get(gpio.port, gpio.pin);
-    int res = gpio_pin_get_TEST(&gpio);
+    int res = gpio_pin_get_dt(&gpio);
 
     printk("\r\n");
     printk("TESTING GPIO\r\n");
