@@ -10,6 +10,13 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 # set(SOURCES button_press_handler_test.c)
 test_runner_generate(/home/carlk/repos/zb-lightbulb/light_bulb_dongle/test/src/button_press_handler_test.c)
 
+cmock_handle(${ZEPHYR_BASE}/include/zephyr/drivers/gpio.h drivers)
+
+# add module gpio
+# target_sources(app PRIVATE ${ZEPHYR_BASE}/include/zephyr/drivers/gpio.c)
+# target_include_directories(app PRIVATE ${ZEPHYR_BASE}/include/zephyr/drivers)
+
+
 # add module uut
 target_sources(app PRIVATE ../src/button_press_handler/button_press_handler.c)
 target_include_directories(app PRIVATE ../src/button_press_handler)
