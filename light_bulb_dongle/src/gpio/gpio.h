@@ -1,6 +1,8 @@
 #ifndef GPIO_H
 #define GPIO_H 1
 
-int gpio_pin_get_TEST(int a);
+#include <drivers/gpio.h>
+
+int gpio_pin_get_TEST(struct gpio_dt_spec* a);
 
 #endif /* GPIO_H */

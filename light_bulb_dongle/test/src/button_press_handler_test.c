@@ -15,7 +15,7 @@ void test_get_button_press_handler() {
 
 void test_get_debounced_press() {
     struct Button_Press_Handler handler = get_button_press_handler();
-    __wrap_gpio_pin_get_TEST_ExpectAndReturn(1, 0);
+    __wrap_gpio_pin_get_TEST_ExpectAnyArgsAndReturn(0);
     handler.poll_interval_ms = 30;
     handler.debounce_timer_ms = 200;
     handler.press_timer_ms = 4970;
