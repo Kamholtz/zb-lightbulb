@@ -1,7 +1,8 @@
 #include "../../src/button_press_handler/button_press_handler.h"
 #include <unity.h>
 // #include <drivers/gpio.h>
-#include "drivers/mock_gpio.h"
+// #include "drivers/mock_gpio.h"
+#include "gpio/mock_gpio.h"
 
 
 #define RUN_LED_BLINK_INTERVAL          25
@@ -14,7 +15,7 @@ void test_get_button_press_handler() {
 
 void test_get_debounced_press() {
     struct Button_Press_Handler handler = get_button_press_handler();
-    __wrap_gpio_pin_get_dt_IgnoreAndReturn(0);
+    __wrap_gpio_pin_get_TEST_ExpectAndReturn(1, 0);
     handler.poll_interval_ms = 30;
     handler.debounce_timer_ms = 200;
     handler.press_timer_ms = 4970;
