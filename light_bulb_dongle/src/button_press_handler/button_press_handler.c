@@ -7,25 +7,13 @@ struct Button_Press_Handler get_button_press_handler(struct gpio_dt_spec button)
     button_press_handler.debounce_timer_ms = 0;
     button_press_handler.time_thresh = 0;
     button_press_handler.completed_button_press_thresh = 0;
-    // button_press_handler.gpio = {.pin = 1};
 
     return button_press_handler;
 }
 
 bool is_button_pressed(struct gpio_dt_spec gpio) {
-    // return gpio_pin_get(gpio.port, gpio.pin);
-    int res = gpio_pin_get_dt(&gpio);
-
-    printk("\r\n");
-    printk("TESTING GPIO\r\n");
-    printk("res: %d\r\n", res);
-
-    return res;
+    return gpio_pin_get_dt(&gpio);
 }
-
-// bool is_button_pressed(struct gpio_dt_spec gpio) {
-//     return 0;
-// }
 
 void get_debounced_press(struct Button_Press_Handler* h) {
     int button_is_pressed = is_button_pressed(h->gpio);
