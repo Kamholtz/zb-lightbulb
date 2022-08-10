@@ -11,7 +11,7 @@ struct Button_Press_Handler {
     int poll_interval_ms;
     int* time_thresh;
     int completed_button_press_thresh;
-    bool debounce_is_pressed;
+    bool is_debounced;
     bool press_handled;
 };
 

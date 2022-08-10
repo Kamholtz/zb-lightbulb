@@ -1,4 +1,7 @@
 #include "button_press_handler.h"
+#include <logging/log.h>
+
+LOG_MODULE_REGISTER(button_press_handler, LOG_LEVEL_INF);
 
 struct Button_Press_Handler get_button_press_handler(struct gpio_dt_spec button) {
     struct Button_Press_Handler button_press_handler;
@@ -22,23 +25,26 @@ void get_debounced_press(struct Button_Press_Handler* h) {
         h->debounce_timer_ms += h->poll_interval_ms;
     }
 
-    if (button_is_pressed != h->debounce_is_pressed) {
+    if (button_is_pressed != h->is_debounced) {
         // Increment when there is a difference
         h->debounce_timer_ms += h->poll_interval_ms;
     }
 
-    if (button_is_pressed == h->debounce_is_pressed) {
+    if (button_is_pressed == h->is_debounced) {
         // Reset timer
         h->debounce_timer_ms = 0;
     }
 
-    if (h->debounce_is_pressed) {
+    if (h->is_debounced) {
         h->press_timer_ms += h->poll_interval_ms;
     }
 
     if (h->debounce_timer_ms > 100) { // > 100ms
+
+        LOG_INF("Debounced (INF)!");
+        printk("Debounced (printk)!");
         // debounce time surpassed, debounced state change
-        h->debounce_is_pressed = button_is_pressed;
+        h->is_debounced = button_is_pressed;
 
         if (button_is_pressed == false) {
             // Rising edge/finger lifted

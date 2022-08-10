@@ -17,7 +17,7 @@ void test_get_debounced_press() {
     handler.poll_interval_ms = 30;
     handler.debounce_timer_ms = 200;
     handler.press_timer_ms = 4970;
-    handler.debounce_is_pressed = true;
+    handler.is_debounced = true;
     get_debounced_press(&handler);
 
     TEST_ASSERT_EQUAL(5000, handler.completed_button_press_thresh);
