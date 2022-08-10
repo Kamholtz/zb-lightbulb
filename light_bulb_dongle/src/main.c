@@ -933,9 +933,9 @@ void main(void)
             LOG_INF("Debounced press: %d ms", bp_handler.completed_button_press_thresh);
 
             // Rising edge/finger lifted
-            if (bp_handler.completed_button_press_thresh > 5000) {
+            if (bp_handler.completed_button_press_thresh > 8000) {
                 // action for 5 second press
-                LOG_INF("5 second button press");
+                LOG_INF("8 second button press");
                 LOG_INF("Resetting zigbee network config");
                 zb_bdb_reset_via_local_action(0);
             } else if (bp_handler.completed_button_press_thresh > 1000) { // > 1000ms
