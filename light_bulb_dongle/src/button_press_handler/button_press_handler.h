@@ -4,7 +4,7 @@
 #include <zephyr/types.h>
 #include <drivers/gpio.h>
 
-struct Button_Press_Handler {
+typedef struct Button_Press_Handler {
     struct gpio_dt_spec gpio;
     int press_timer_ms;
     int debounce_timer_ms;
@@ -13,10 +13,11 @@ struct Button_Press_Handler {
     int completed_button_press_thresh;
     bool is_debounced;
     bool press_handled;
-};
+} button_press_handler_t;
 
 struct Button_Press_Handler get_button_press_handler();
 void get_debounced_press(struct Button_Press_Handler* h);
+void set_button_press_handled(button_press_handler_t* h);
 
 
 #endif /* BUTTON_PRESS_HANDLER_H */

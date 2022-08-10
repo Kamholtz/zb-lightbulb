@@ -14,5 +14,6 @@ project("Zigbee coordinator")
 target_sources(app PRIVATE
   src/main.c
   src/usb_logging.c
+  src/button_press_handler/button_press_handler.c
 )
 # NORDIC SDK APP END

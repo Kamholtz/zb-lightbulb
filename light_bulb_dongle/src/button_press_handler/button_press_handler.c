@@ -10,12 +10,18 @@ struct Button_Press_Handler get_button_press_handler(struct gpio_dt_spec button)
     button_press_handler.debounce_timer_ms = 0;
     button_press_handler.time_thresh = 0;
     button_press_handler.completed_button_press_thresh = 0;
+    button_press_handler.press_handled = true;
 
     return button_press_handler;
 }
 
 bool is_button_pressed(struct gpio_dt_spec gpio) {
     return gpio_pin_get_dt(&gpio);
+}
+
+void set_button_press_handled(button_press_handler_t* h) {
+    h->completed_button_press_thresh = 0;
+    h->press_handled = true;
 }
 
 void get_debounced_press(struct Button_Press_Handler* h) {
@@ -40,9 +46,6 @@ void get_debounced_press(struct Button_Press_Handler* h) {
     }
 
     if (h->debounce_timer_ms > 100) { // > 100ms
-
-        LOG_INF("Debounced (INF)!");
-        printk("Debounced (printk)!");
         // debounce time surpassed, debounced state change
         h->is_debounced = button_is_pressed;
 

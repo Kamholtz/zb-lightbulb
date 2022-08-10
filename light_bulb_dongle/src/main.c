@@ -836,9 +836,6 @@ void init_button(void) {
     printk("Press the button\n");
 }
 
-bool is_button_pressed(void) {
-    return gpio_pin_get(button.port, button.pin);
-}
 
 void main(void)
 {
@@ -906,12 +903,11 @@ void main(void)
     const uint8_t level_control_inc = UINT8_MAX/3;
     uint8_t level_control_value = 0;
 
-    // struct Button_Press_Handler button_press_handler[1];
-    // button_press_handler[0].gpio = button;
-    // button_press_handler[0].press_timer_ms = 0;
-    // button_press_handler[0].debounce_timer_ms = 0;
-    // button_press_handler[0].time_thresh = 0;
-    // button_press_handler[0].completed_button_press_thresh = 0;
+    button_press_handler_t bp_handler = get_button_press_handler();
+
+    bp_handler.gpio = button;
+    bp_handler.poll_interval_ms = RUN_LED_BLINK_INTERVAL;
+
 
 
     while (1) {
@@ -926,67 +922,47 @@ void main(void)
         }
 
         k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
+        get_debounced_press(&bp_handler);
 
-        // Button press + debounce + handlers
-        button_is_pressed = is_button_pressed();
+        if (!bp_handler.press_handled && bp_handler.completed_button_press_thresh > 0) {
+            LOG_INF("Debounced press: %d ms", bp_handler.completed_button_press_thresh);
 
-        if (button_is_pressed != debounce_is_pressed) {
-            // Increment when there is a difference
-            debounce_timer += RUN_LED_BLINK_INTERVAL;
-        }
+            // Rising edge/finger lifted
+            if (bp_handler.completed_button_press_thresh > 5000) {
+                // action for 5 second press
+                LOG_INF("5 second button press");
+                LOG_INF("Resetting zigbee network config");
+                zb_bdb_reset_via_local_action(0);
+            } else if (bp_handler.completed_button_press_thresh > 1000) { // > 1000ms
+                // action for 1 second press
+                LOG_INF("1 second button press");
 
-        if (button_is_pressed == debounce_is_pressed) {
-            // Reset timer
-            debounce_timer = 0;
-        }
-
-        if (debounce_is_pressed) {
-            press_timer += RUN_LED_BLINK_INTERVAL;
-        }
-
-        if (debounce_timer > 100) { // > 100ms
-            // debounce time surpassed, debounced state change
-            debounce_is_pressed = button_is_pressed;
-            LOG_INF("Debounced");
-
-            if (button_is_pressed == false) {
-                // Rising edge/finger lifted
-                if (press_timer > 5000) {
-                    // action for 5 second press
-                    LOG_INF("5 second button press");
-                    LOG_INF("Resetting zigbee network config");
-                    zb_bdb_reset_via_local_action(0);
-                } else if (press_timer > 1000) { // > 1000ms
-                    // action for 1 second press
-                    LOG_INF("1 second button press");
-
-                    // Turn everything off
-                    status_on = !status_on;
-                    if (status_on) {
-                        // Let other handlers turn the LEDs back on
-                        dk_set_led(ZIGBEE_NETWORK_STATE_LED, get_zb_network_status_led_state(g_app_sig, g_app_sig_status));
-                    } else {
-                        dk_set_led(RUN_STATUS_LED, 0);
-                        dk_set_led(ZIGBEE_NETWORK_STATE_LED, 0);
-                        // light_bulb_set_brightness(0);
-                    }
-
+                // Turn everything off
+                status_on = !status_on;
+                if (status_on) {
+                    // Let other handlers turn the LEDs back on
+                    dk_set_led(ZIGBEE_NETWORK_STATE_LED, get_zb_network_status_led_state(g_app_sig, g_app_sig_status));
                 } else {
-                    // action for momentary press
-                    LOG_INF("Momentary button press");
-
-                    level_control_value = ((int)(dev_ctx.level_control_attr.current_level/level_control_inc)) * level_control_inc;
-
-                    if (level_control_value == UINT8_MAX) {
-                        level_control_value = 0;
-                    } else {
-                        level_control_value += level_control_inc;
-                    }
-                    level_control_set_value(level_control_value);
+                    dk_set_led(RUN_STATUS_LED, 0);
+                    dk_set_led(ZIGBEE_NETWORK_STATE_LED, 0);
+                    // light_bulb_set_brightness(0);
                 }
 
-                press_timer = 0;
+            } else {
+                // action for momentary press
+                LOG_INF("Momentary button press");
+
+                level_control_value = ((int)(dev_ctx.level_control_attr.current_level/level_control_inc)) * level_control_inc;
+
+                if (level_control_value == UINT8_MAX) {
+                    level_control_value = 0;
+                } else {
+                    level_control_value += level_control_inc;
+                }
+                level_control_set_value(level_control_value);
             }
+
+            set_button_press_handled(&bp_handler);
         }
 
 
