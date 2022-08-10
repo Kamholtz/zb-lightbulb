@@ -976,6 +976,10 @@ void main(void)
 
             LOG_INF("Button 5, Debounced press: %d ms", bp_handler_5.completed_button_press_thresh);
 
+            if (bp_handler_5.completed_button_press_thresh > 1000) {
+                send_on_off_toggle_cmd();
+            }
+
             set_button_press_handled(&bp_handler_5);
         }
 
