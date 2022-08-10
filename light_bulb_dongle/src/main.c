@@ -140,6 +140,7 @@
 #endif
 
 
+// Button 1
 #define PRESENCE_NODE	DT_ALIAS(presence_sensor)
 #if !DT_NODE_HAS_STATUS(PRESENCE_NODE, okay)
 #error "Unsupported board: presence_sensor devicetree alias is not defined"
@@ -147,6 +148,15 @@
 
 static const struct gpio_dt_spec button = GPIO_DT_SPEC_GET_OR(PRESENCE_NODE, gpios, {0});
 static struct gpio_callback button_cb_data;
+
+// Button 5
+#define BUTTON_5	DT_ALIAS(button_5)
+#if !DT_NODE_HAS_STATUS(BUTTON_5, okay)
+#error "Unsupported board: button_5 devicetree alias is not defined"
+#endif
+
+static const struct gpio_dt_spec button_5 = GPIO_DT_SPEC_GET_OR(BUTTON_5, gpios, {0});
+// static struct gpio_callback button_cb_data;
 
 
 /* Led PWM period, calculated for 50 Hz signal - in microseconds. */
@@ -805,33 +815,33 @@ void zboss_signal_handler(zb_bufid_t bufid)
     }
 }
 
-void init_button(void) {
+void init_button(struct gpio_dt_spec gpio) {
 
     int ret;
-    if (!device_is_ready(button.port)) {
-        printk("Error: button device %s is not ready\n",
-               button.port->name);
+    if (!device_is_ready(gpio.port)) {
+        printk("Error: gpio device %s is not ready\n",
+               gpio.port->name);
         return;
     }
 
-    ret = gpio_pin_configure_dt(&button, GPIO_INPUT);
+    ret = gpio_pin_configure_dt(&gpio, GPIO_INPUT);
     if (ret != 0) {
         printk("Error %d: failed to configure %s pin %d\n",
-               ret, button.port->name, button.pin);
+               ret, gpio.port->name, gpio.pin);
         return;
     }
 
-    // ret = gpio_pin_interrupt_configure_dt(&button,
+    // ret = gpio_pin_interrupt_configure_dt(&gpio,
     //                       GPIO_INT_EDGE_TO_ACTIVE);
     // if (ret != 0) {
     //     printk("Error %d: failed to configure interrupt on %s pin %d\n",
-    //         ret, button.port->name, button.pin);
+    //         ret, gpio.port->name, gpio.pin);
     //     return;
     // }
 
-    // gpio_init_callback(&button_cb_data, button_pressed, BIT(button.pin));
-    // gpio_add_callback(button.port, &button_cb_data);
-    printk("Set up button at %s pin %d\n", button.port->name, button.pin);
+    // gpio_init_callback(&button_cb_data, button_pressed, BIT(gpio.pin));
+    // gpio_add_callback(gpio.port, &button_cb_data);
+    printk("Set up gpio/button at %s pin %d\n", gpio.port->name, gpio.pin);
 
     printk("Press the button\n");
 }
@@ -852,7 +862,8 @@ void main(void)
     }
 
     // Button interrupt - to become prescence sensor
-    init_button();
+    init_button(button);
+    init_button(button_5);
     // Button end
 
 
@@ -888,16 +899,6 @@ void main(void)
 
     LOG_INF("ZBOSS Light Bulb example started");
 
-
-    int button_press_state = 0;
-
-
-    bool button_is_pressed = false;
-    bool debounce_is_pressed = false;
-    int press_timer = 0;
-    int debounce_timer = 0;
-
-
     int loop_count = 0;
     const int blink_toggle = (1000/RUN_LED_BLINK_INTERVAL);
     const uint8_t level_control_inc = UINT8_MAX/3;
@@ -908,6 +909,10 @@ void main(void)
     bp_handler.gpio = button;
     bp_handler.poll_interval_ms = RUN_LED_BLINK_INTERVAL;
 
+    button_press_handler_t bp_handler_5 = get_button_press_handler();
+
+    bp_handler_5.gpio = button_5;
+    bp_handler_5.poll_interval_ms = RUN_LED_BLINK_INTERVAL;
 
 
     while (1) {
@@ -965,6 +970,14 @@ void main(void)
             set_button_press_handled(&bp_handler);
         }
 
+
+        get_debounced_press(&bp_handler_5);
+        if (!bp_handler_5.press_handled && bp_handler_5.completed_button_press_thresh > 0) {
+
+            LOG_INF("Button 5, Debounced press: %d ms", bp_handler_5.completed_button_press_thresh);
+
+            set_button_press_handled(&bp_handler_5);
+        }
 
         // if (toggle_occupancy_flag)
         // {

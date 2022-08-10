@@ -19,8 +19,12 @@
 	};
     buttons {
         button4: button_4 {
-            gpios = < &gpio1 0xb 0x11 >; // P0.11
+            gpios = < &gpio1 0xb 0x11 >; // P1.11 (1.xx inferred by first element `gpio1`, y.11 is inferred by 0xb = 11)
             label = "Presence Sensor";
+        };
+        button5: button_5 {
+            gpios = < &gpio1 13 0x11 >;
+            label = "Button 5";
         };
     };
 
@@ -28,9 +32,13 @@
 		pwm-on-board = &pwm_led3;
 		pwm-ext0 = &ext_pwm_led;
         presence-sensor = &button4;
+        button-5 = &button5;
     };
 };
 
+arduino_spi: &spi3 {
+	status = "disabled";
+};
 // &pwm0 {
 //     ch1-pin = < 16 >;
 //     ch1-inverted;
