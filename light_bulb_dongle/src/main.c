@@ -56,6 +56,9 @@
 /* Device endpoint, used to receive on off switch commands. */
 #define HA_ON_OFF_SWITCH_ENDPOINT   12
 
+/* Device endpoint, used to receive on off switch commands. */
+#define HA_ON_OFF_SWITCH_ENDPOINT_2   13
+
 /* Version of the application software (1 byte). */
 #define BULB_INIT_BASIC_APP_VERSION     01
 
@@ -183,6 +186,7 @@ typedef struct {
     zb_zcl_occupancy_sensing_attrs_t occupancy_sensing_attr;
 
     zb_zcl_on_off_switch_configuration_attrs_t     switch_on_off_switch_conf_attr;
+    zb_zcl_on_off_switch_configuration_attrs_t     switch_on_off_switch_conf_attr_2;
     zb_zcl_scenes_attrs_t            switch_scenes_attr;
     zb_zcl_groups_attrs_t            switch_groups_attr;
     zb_zcl_on_off_attrs_t            switch_on_off_attr;
@@ -272,6 +276,25 @@ ZB_HA_DECLARE_ON_OFF_SWITCH_CLUSTER_LIST(
     // switch_groups_attr_list // groups
     );
 
+
+// ON OFF 2
+ZB_ZCL_DECLARE_ON_OFF_SWITCH_CONFIGURATION_ATTRIB_LIST(
+    switch_on_off_switch_conf_attr_list_2,
+    &dev_ctx.switch_on_off_switch_conf_attr_2.switch_type,
+    &dev_ctx.switch_on_off_switch_conf_attr_2.switch_actions
+);
+
+ZB_HA_DECLARE_ON_OFF_SWITCH_CLUSTER_LIST(
+    on_off_switch_clusters_2,
+    switch_on_off_switch_conf_attr_list_2, // on off switch config
+    identify_attr_list, // identify
+    basic_attr_list // basic
+    // switch_on_off_attr_list, // on off
+    // switch_scenes_attr_list, // scenes
+    // switch_client_identify_attr_list, // identify - need to make the client version of identify (look at cluster spec for client)
+    // switch_groups_attr_list // groups
+    );
+
 /* On/Off cluster attributes additions data */
 ZB_ZCL_DECLARE_ON_OFF_ATTRIB_LIST(
     on_off_attr_list,
@@ -315,14 +338,20 @@ ZB_HA_DECLARE_ON_OFF_SWITCH_EP(
     HA_ON_OFF_SWITCH_ENDPOINT,
     on_off_switch_clusters);
 
+
+ZB_HA_DECLARE_ON_OFF_SWITCH_EP(
+    on_off_switch_ep_2,
+    HA_ON_OFF_SWITCH_ENDPOINT_2,
+    on_off_switch_clusters_2);
 // ZB_HA_DECLARE_DIMMABLE_LIGHT_CTX(
 // 	dimmable_light_ctx,
 // 	dimmable_light_ep);
 
-ZBOSS_DECLARE_DEVICE_CTX_2_EP(
+ZBOSS_DECLARE_DEVICE_CTX_3_EP(
     dimmable_light_ctx,
     dimmable_light_ep,
-    on_off_switch_ep
+    on_off_switch_ep,
+    on_off_switch_ep_2
 );
 
 
@@ -515,7 +544,7 @@ struct bulb_context {
     struct k_timer find_alarm;
 };
 
-static struct bulb_context bulb_ctx;
+static struct bulb_context bulb_ctx; // Probably need to set the properties on this... Seems to be the the context for the bulb it is paired with
 
 /**@brief Function for sending ON/OFF requests to the light bulb.
  *
@@ -525,13 +554,34 @@ static struct bulb_context bulb_ctx;
  */
 static void light_switch_send_on_off(zb_bufid_t bufid, zb_uint16_t cmd_id)
 {
-    LOG_INF("Send ON/OFF command: %d", cmd_id);
+    LOG_INF("1. Send ON/OFF command: %d", cmd_id);
 
     ZB_ZCL_ON_OFF_SEND_REQ(bufid,
                    bulb_ctx.short_addr,
                    ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
                    bulb_ctx.endpoint,
                    HA_ON_OFF_SWITCH_ENDPOINT,
+                   ZB_AF_HA_PROFILE_ID,
+                   ZB_ZCL_DISABLE_DEFAULT_RESPONSE,
+                   cmd_id,
+                   NULL);
+}
+
+/**@brief Function for sending ON/OFF requests to the light bulb.
+ *
+ * @param[in]   bufid    Non-zero reference to Zigbee stack buffer that will be
+ *                       used to construct on/off request.
+ * @param[in]   cmd_id   ZCL command id.
+ */
+static void light_switch_send_on_off_2(zb_bufid_t bufid, zb_uint16_t cmd_id)
+{
+    LOG_INF("2. Send ON/OFF command: %d", cmd_id);
+
+    ZB_ZCL_ON_OFF_SEND_REQ(bufid,
+                   bulb_ctx.short_addr,
+                   ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
+                   bulb_ctx.endpoint,
+                   HA_ON_OFF_SWITCH_ENDPOINT_2,
                    ZB_AF_HA_PROFILE_ID,
                    ZB_ZCL_DISABLE_DEFAULT_RESPONSE,
                    cmd_id,
@@ -563,12 +613,20 @@ void send_on_off_cmd(bool isOn) {
         light_switch_send_on_off, cmd_id, 0);
 }
 
-void send_on_off_toggle_cmd() {
+void send_on_off_toggle_cmd(uint16_t endpoint_id) {
     zb_ret_t zb_err_code;
 
-    // TODO: Look into why this is "delayed"
-    zb_err_code = zb_buf_get_out_delayed_ext(
-        light_switch_send_on_off, ZB_ZCL_CMD_ON_OFF_TOGGLE_ID, 0);
+    switch (endpoint_id) {
+        case HA_ON_OFF_SWITCH_ENDPOINT:
+            // TODO: Look into why this is "delayed"
+            zb_err_code = zb_buf_get_out_delayed_ext(
+            light_switch_send_on_off, ZB_ZCL_CMD_ON_OFF_TOGGLE_ID, 0);
+            break;
+        case HA_ON_OFF_SWITCH_ENDPOINT_2:
+            zb_err_code = zb_buf_get_out_delayed_ext(
+            light_switch_send_on_off_2, ZB_ZCL_CMD_ON_OFF_TOGGLE_ID, 0);
+            break;
+    }
 }
 
 enum zb_zcl_occupancy_sensing_occupancy_e get_opposite_occupancy_state () {
@@ -965,6 +1023,8 @@ void main(void)
                     level_control_value += level_control_inc;
                 }
                 level_control_set_value(level_control_value);
+
+                send_on_off_toggle_cmd(HA_ON_OFF_SWITCH_ENDPOINT);
             }
 
             set_button_press_handled(&bp_handler);
@@ -976,8 +1036,8 @@ void main(void)
 
             LOG_INF("Button 5, Debounced press: %d ms", bp_handler_5.completed_button_press_thresh);
 
-            if (bp_handler_5.completed_button_press_thresh > 1000) {
-                send_on_off_toggle_cmd();
+            send_on_off_toggle_cmd(HA_ON_OFF_SWITCH_ENDPOINT_2);
+            if (bp_handler_5.completed_button_press_thresh > 500) {
             }
 
             set_button_press_handled(&bp_handler_5);

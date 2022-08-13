@@ -161,6 +161,82 @@
     }
 
 
+#define __CAT_VA__(a, b, ...)                               a## __VA_ARGS__## b
+
+#if 0
+
+// The following is here only for reference to create multiple endpoints of the same type (on off switch)
+
+/**@brief Redefinition of ZB_AF_SIMPLE_DESC_TYPE as variadic macro.
+ *
+ * @param[in]  in_num   Number of input clusters.
+ * @param[in]  out_num  Number of output clusters.
+ * @param[in]  ...      Optional argument to concatenate to the type name.
+ */
+#define ZB_AF_SIMPLE_DESC_TYPE_VA(in_num, out_num, ...)     __CAT_VA__(zb_af_simple_desc_, _t, __VA_ARGS__)
+
+/**@brief Redefinition of ZB_DECLARE_SIMPLE_DESC as variadic macro.
+ *
+ * @param[in]  in_clusters_count   Number of input clusters.
+ * @param[in]  out_clusters_count  Number of output clusters.
+ * @param[in]  ...                 Optional argument to concatenate to the type name.
+ */
+#define ZB_DECLARE_SIMPLE_DESC_VA(in_clusters_count, out_clusters_count, ...)             \
+  typedef ZB_PACKED_PRE struct zb_af_simple_desc_## __VA_ARGS__## _s                      \
+  {                                                                                       \
+    zb_uint8_t    endpoint;                 /* Endpoint */                                \
+    zb_uint16_t   app_profile_id;           /* Application profile identifier */          \
+    zb_uint16_t   app_device_id;            /* Application device identifier */           \
+    zb_bitfield_t app_device_version:4;     /* Application device version */              \
+    zb_bitfield_t reserved:4;               /* Reserved */                                \
+    zb_uint8_t    app_input_cluster_count;  /* Application input cluster count */         \
+    zb_uint8_t    app_output_cluster_count; /* Application output cluster count */        \
+    /* Application input and output cluster list */                                       \
+    zb_uint16_t   app_cluster_list[(in_clusters_count) + (out_clusters_count)];           \
+    zb_uint8_t    cluster_encryption[((in_clusters_count) + (out_clusters_count) + 7)/8]; \
+  } ZB_PACKED_STRUCT zb_af_simple_desc_## __VA_ARGS__## _t
+
+
+#endif
+
+/** @cond DOXYGEN_INTERNAL_DOC */
+#define CAT5(a, b, c, d, e) a##b##c##d##e
+/** @endcond */ /* DOXYGEN_INTERNAL_DOC */
+
+/** Generate simple descriptor type name */
+// #define ZB_AF_SIMPLE_DESC_TYPE_VA(in_num, out_num, ...)  CAT5(zb_af_simple_desc_,in_num,_,out_num,_t)
+#define ZB_AF_SIMPLE_DESC_TYPE_VA(in_num, out_num, ...)  __CAT_VA__(zb_af_simple_desc_,_t, __VA_ARGS__)
+
+// ZB_AF_SIMPLE_DESC_TYPE_VA(1,2,aaa)
+
+/**
+   Declares Simple descriptor type
+
+   @param in_clusters_count - number of input clusters in descriptor
+   @param out_clusters_count - number of output clusters in descriptor
+
+   @b Example:
+   @code
+     ZB_DECLARE_SIMPLE_DESC(5, 5);
+   @endcode
+ */
+
+#define ZB_DECLARE_SIMPLE_DESC_VA(in_clusters_count, out_clusters_count, ...)   \
+  typedef ZB_PACKED_PRE struct zb_af_simple_desc_## __VA_ARGS__## _s \
+  {                                                                                       \
+    zb_uint8_t    endpoint;                 /* Endpoint */                                \
+    zb_uint16_t   app_profile_id;           /* Application profile identifier */          \
+    zb_uint16_t   app_device_id;            /* Application device identifier */           \
+    zb_bitfield_t app_device_version:4;     /* Application device version */              \
+    zb_bitfield_t reserved:4;               /* Reserved */                                \
+    zb_uint8_t    app_input_cluster_count;  /* Application input cluster count */         \
+    zb_uint8_t    app_output_cluster_count; /* Application output cluster count */        \
+    /* Application input and output cluster list */                                       \
+    zb_uint16_t   app_cluster_list[(in_clusters_count) + (out_clusters_count)];               \
+  } ZB_PACKED_STRUCT                                                                      \
+  zb_af_simple_desc_## __VA_ARGS__## _t
+
+
 /** @cond internals_doc */
 /** @brief Declare simple descriptor for On/Off switch device
     @param ep_name - endpoint variable name
@@ -171,8 +247,8 @@
     definitions, because these values are used to form simple descriptor type name
 */
 #define ZB_ZCL_DECLARE_ON_OFF_SWITCH_SIMPLE_DESC(ep_name, ep_id, in_clust_num, out_clust_num) \
-  ZB_DECLARE_SIMPLE_DESC(in_clust_num, out_clust_num);                                        \
-  ZB_AF_SIMPLE_DESC_TYPE(in_clust_num, out_clust_num) simple_desc_##ep_name =                 \
+  ZB_DECLARE_SIMPLE_DESC_VA(in_clust_num, out_clust_num, ep_name);                                        \
+  ZB_AF_SIMPLE_DESC_TYPE_VA(in_clust_num, out_clust_num, ep_name) simple_desc_##ep_name =                 \
   {                                                                                           \
     ep_id,                                                                                    \
     ZB_AF_HA_PROFILE_ID,                                                                      \
