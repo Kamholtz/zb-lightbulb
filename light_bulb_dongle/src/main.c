@@ -860,6 +860,17 @@ void zboss_signal_handler(zb_bufid_t bufid)
 
     get_zb_network_status_led_state(g_app_sig, g_app_sig_status);
 
+    switch (g_app_sig) {
+        case ZB_COMMON_SIGNAL_CAN_SLEEP:
+            /* Enter poll so other tasks may be processed.
+            * This should be the third and the last startup signal.
+            */
+            // k_sem_give(&zboss_init_lock);
+            LOG_INF("Received ZB_COMMON_SIGNAL_CAN_SLEEP");
+            zb_sleep_now();
+            break;
+    }
+
     /* No application-specific behavior is required.
      * Call default signal handler.
      */
@@ -951,6 +962,12 @@ void main(void)
     usb_logging_init();
 #endif
     // END - USB logging on dongle
+
+    zigbee_configure_sleepy_behavior(true);
+
+    if (IS_ENABLED(CONFIG_RAM_POWER_DOWN_LIBRARY)) {
+        power_down_unused_ram();
+    }
 
     /* Start Zigbee default thread */
     zigbee_enable();
