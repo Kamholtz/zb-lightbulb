@@ -36,6 +36,7 @@
     };
 };
 
+// Userd by button5
 arduino_spi: &spi3 {
 	status = "disabled";
 };
