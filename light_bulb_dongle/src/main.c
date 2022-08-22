@@ -809,7 +809,7 @@ static void zcl_device_cb(zb_bufid_t bufid)
     LOG_INF("%s status: %hd", __func__, device_cb_param->status);
 }
 
-bool status_on = true;
+bool status_on = false;
 zb_zdo_app_signal_type_t g_app_sig;
 zb_ret_t g_app_sig_status;
 
@@ -963,6 +963,8 @@ void main(void)
 #endif
     // END - USB logging on dongle
 
+    zb_set_ed_timeout(ED_AGING_TIMEOUT_64MIN);
+    zb_set_keepalive_timeout(ZB_MILLISECONDS_TO_BEACON_INTERVAL(3000));
     zigbee_configure_sleepy_behavior(true);
 
     if (IS_ENABLED(CONFIG_RAM_POWER_DOWN_LIBRARY)) {
