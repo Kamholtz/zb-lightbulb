@@ -36,6 +36,11 @@
     };
 };
 
+&gpio1 {
+	status = "okay";
+    wakeup-source;
+};
+
 // Userd by button5
 arduino_spi: &spi3 {
 	status = "disabled";

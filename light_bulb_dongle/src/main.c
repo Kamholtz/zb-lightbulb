@@ -17,6 +17,8 @@
 #include <dk_buttons_and_leds.h>
 #include <drivers/gpio.h>
 #include <settings/settings.h>
+#include <pm/pm.h>
+#include <pm/device.h>
 
 #define ZB_ZCL_SUPPORT_CLUSTER_OCCUPANCY_SENSING 1 // Likely don't need this, but keep for the meantime
 // #define ZB_HA_DEFINE_DEVICE_ON_OFF_SWITCH
@@ -809,7 +811,7 @@ static void zcl_device_cb(zb_bufid_t bufid)
     LOG_INF("%s status: %hd", __func__, device_cb_param->status);
 }
 
-bool status_on = false;
+bool status_on = true;
 zb_zdo_app_signal_type_t g_app_sig;
 zb_ret_t g_app_sig_status;
 
@@ -971,6 +973,12 @@ void main(void)
         power_down_unused_ram();
     }
 
+    // pm_constraint_set(PM_STATE_SOFT_OFF);
+
+    // pm_device_wakeup_enable()
+
+
+
     /* Start Zigbee default thread */
     zigbee_enable();
 
@@ -1004,6 +1012,11 @@ void main(void)
         }
 
         k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
+
+        struct pm_state_info pm_state_info = {PM_STATE_STANDBY, 0, 0};
+        pm_state_force(0, &pm_state_info);
+
+
         get_debounced_press(&bp_handler);
 
         if (!bp_handler.press_handled && bp_handler.completed_button_press_thresh > 0) {
