@@ -7,6 +7,14 @@
         {
             "name": "light_bulb_dongle",
             "path": "light_bulb_dongle"
+        },
+        {
+            "name": "light_switch2",
+            "path": "light_switch2"
+        },
+        {
+            "name": "blinky",
+            "path": "blinky"
         }
     ],
     "settings": {
@@ -14,7 +22,10 @@
         "nrf-connect.toolchain.path": "${nrf-connect.toolchain:2.0.0}",
         "nrf-connect.applications": [
             "${workspaceFolder}",
-            "${workspaceFolder:light_bulb_dongle}"
+            "${workspaceFolder:light_bulb_dongle}",
+            "c:\\Users\\carlk\\repos\\zb-lightbulb\\light_switch",
+            "c:\\Users\\carlk\\repos\\zb-lightbulb\\light_switch2",
+            "c:\\Users\\carlk\\repos\\zb-lightbulb\\blinky"
         ],
         "files.associations": {
             "zigbee_zcl_scenes.h": "c",
@@ -39,7 +50,8 @@
             "zb_ha_on_off_switch.h": "c",
             "types.h": "c",
             "settings.h": "c",
-            "__assert.h": "c"
+            "__assert.h": "c",
+            "pm.h": "c"
         },
         "cortex-debug.variableUseNaturalFormat": false
     }

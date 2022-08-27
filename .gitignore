@@ -58,3 +58,12 @@ light_bulb/nrf52840-dongle/*
 light_bulb_dongle/build
 light_bulb_dongle/build-*
 light_bulb_dongle/test/build
+
+blinky/build
+blinky/build-*
+blinky/test/build
+
+light_switch2/build
+light_switch2/build-*
+light_switch2/test/build
+
