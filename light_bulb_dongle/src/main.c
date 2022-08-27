@@ -1029,6 +1029,15 @@ void main(void)
     ext_btn_bps[0].gpio = ext_btn_1;
     ext_btn_bps[0].poll_interval_ms = RUN_LED_BLINK_INTERVAL;
 
+    ext_btn_bps[1].gpio = ext_btn_2;
+    ext_btn_bps[1].poll_interval_ms = RUN_LED_BLINK_INTERVAL;
+
+    ext_btn_bps[2].gpio = ext_btn_3;
+    ext_btn_bps[2].poll_interval_ms = RUN_LED_BLINK_INTERVAL;
+
+    ext_btn_bps[3].gpio = ext_btn_4;
+    ext_btn_bps[3].poll_interval_ms = RUN_LED_BLINK_INTERVAL;
+
     while (1) {
 
         // Status LED
@@ -1087,16 +1096,20 @@ void main(void)
         }
 
 
-        get_debounced_press(&ext_btn_bps[0]);
-        if (!ext_btn_bps[0].press_handled && ext_btn_bps[0].completed_button_press_thresh > 0) {
+        uint8_t bp_ii = 0;
+        for (bp_ii = 0; bp_ii < 4; bp_ii++) {
+            get_debounced_press(&ext_btn_bps[bp_ii]);
+            if (!ext_btn_bps[bp_ii].press_handled && ext_btn_bps[bp_ii].completed_button_press_thresh > 0) {
 
-            LOG_INF("Button 5, Debounced press: %d ms", ext_btn_bps[0].completed_button_press_thresh);
+                LOG_INF("Button 5, Debounced press: %d ms", ext_btn_bps[bp_ii].completed_button_press_thresh);
 
-            send_on_off_toggle_cmd(HA_ON_OFF_SWITCH_ENDPOINT_2);
-            if (ext_btn_bps[0].completed_button_press_thresh > 500) {
+                send_on_off_toggle_cmd(HA_ON_OFF_SWITCH_ENDPOINT_2);
+
+                if (ext_btn_bps[bp_ii].completed_button_press_thresh > 500) {
+                }
+
+                set_button_press_handled(&ext_btn_bps[bp_ii]);
             }
-
-            set_button_press_handled(&ext_btn_bps[0]);
         }
 
         // if (toggle_occupancy_flag)
