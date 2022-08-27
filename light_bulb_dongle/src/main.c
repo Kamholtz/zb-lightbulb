@@ -54,13 +54,16 @@
 #define HA_OCCUPANCY_SENSING_ENDPOINT   11
 
 /* Device endpoint, used to receive on off switch commands. */
-#define HA_ON_OFF_SWITCH_ENDPOINT   12
+#define HA_ON_OFF_SWITCH_ENDPOINT_1   12
 
 /* Device endpoint, used to receive on off switch commands. */
 #define HA_ON_OFF_SWITCH_ENDPOINT_2   13
 
 /* Device endpoint, used to receive on off switch commands. */
 #define HA_ON_OFF_SWITCH_ENDPOINT_3   14
+
+/* Device endpoint, used to receive on off switch commands. */
+#define HA_ON_OFF_SWITCH_ENDPOINT_4   15
 
 /* Version of the application software (1 byte). */
 #define BULB_INIT_BASIC_APP_VERSION     01
@@ -385,7 +388,7 @@ ZB_DECLARE_DIMMABLE_LIGHT_EP(
 
 ZB_HA_DECLARE_ON_OFF_SWITCH_EP(
     on_off_switch_ep_1,
-    HA_ON_OFF_SWITCH_ENDPOINT,
+    HA_ON_OFF_SWITCH_ENDPOINT_1,
     on_off_switch_clusters_1);
 
 
@@ -605,21 +608,16 @@ struct bulb_context {
 
 static struct bulb_context bulb_ctx; // Probably need to set the properties on this... Seems to be the the context for the bulb it is paired with
 
-/**@brief Function for sending ON/OFF requests to the light bulb.
- *
- * @param[in]   bufid    Non-zero reference to Zigbee stack buffer that will be
- *                       used to construct on/off request.
- * @param[in]   cmd_id   ZCL command id.
- */
-static void light_switch_send_on_off(zb_bufid_t bufid, zb_uint16_t cmd_id)
+
+static void light_switch_send_on_off_on_endpoint(zb_bufid_t bufid, zb_uint16_t cmd_id, zb_uint16_t endpoint)
 {
-    LOG_INF("1. Send ON/OFF command: %d", cmd_id);
+    LOG_INF("Command: %d, Endpoint: %d", cmd_id, endpoint);
 
     ZB_ZCL_ON_OFF_SEND_REQ(bufid,
                    bulb_ctx.short_addr,
                    ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
                    bulb_ctx.endpoint,
-                   HA_ON_OFF_SWITCH_ENDPOINT,
+                   endpoint,
                    ZB_AF_HA_PROFILE_ID,
                    ZB_ZCL_DISABLE_DEFAULT_RESPONSE,
                    cmd_id,
@@ -632,19 +630,42 @@ static void light_switch_send_on_off(zb_bufid_t bufid, zb_uint16_t cmd_id)
  *                       used to construct on/off request.
  * @param[in]   cmd_id   ZCL command id.
  */
+static void light_switch_send_on_off_1(zb_bufid_t bufid, zb_uint16_t cmd_id)
+{
+    light_switch_send_on_off_on_endpoint(bufid, cmd_id, HA_ON_OFF_SWITCH_ENDPOINT_1);
+}
+
+/**@brief Function for sending ON/OFF requests to the light bulb.
+ *
+ * @param[in]   bufid    Non-zero reference to Zigbee stack buffer that will be
+ *                       used to construct on/off request.
+ * @param[in]   cmd_id   ZCL command id.
+ */
 static void light_switch_send_on_off_2(zb_bufid_t bufid, zb_uint16_t cmd_id)
 {
-    LOG_INF("2. Send ON/OFF command: %d", cmd_id);
+    light_switch_send_on_off_on_endpoint(bufid, cmd_id, HA_ON_OFF_SWITCH_ENDPOINT_2);
+}
 
-    ZB_ZCL_ON_OFF_SEND_REQ(bufid,
-                   bulb_ctx.short_addr,
-                   ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-                   bulb_ctx.endpoint,
-                   HA_ON_OFF_SWITCH_ENDPOINT_2,
-                   ZB_AF_HA_PROFILE_ID,
-                   ZB_ZCL_DISABLE_DEFAULT_RESPONSE,
-                   cmd_id,
-                   NULL);
+/**@brief Function for sending ON/OFF requests to the light bulb.
+ *
+ * @param[in]   bufid    Non-zero reference to Zigbee stack buffer that will be
+ *                       used to construct on/off request.
+ * @param[in]   cmd_id   ZCL command id.
+ */
+static void light_switch_send_on_off_3(zb_bufid_t bufid, zb_uint16_t cmd_id)
+{
+    light_switch_send_on_off_on_endpoint(bufid, cmd_id, HA_ON_OFF_SWITCH_ENDPOINT_3);
+}
+
+/**@brief Function for sending ON/OFF requests to the light bulb.
+ *
+ * @param[in]   bufid    Non-zero reference to Zigbee stack buffer that will be
+ *                       used to construct on/off request.
+ * @param[in]   cmd_id   ZCL command id.
+ */
+static void light_switch_send_on_off_4(zb_bufid_t bufid, zb_uint16_t cmd_id)
+{
+    light_switch_send_on_off_on_endpoint(bufid, cmd_id, HA_ON_OFF_SWITCH_ENDPOINT_4);
 }
 
 
@@ -669,21 +690,29 @@ void send_on_off_cmd(bool isOn) {
 
     // TODO: Look into why this is "delayed"
     zb_err_code = zb_buf_get_out_delayed_ext(
-        light_switch_send_on_off, cmd_id, 0);
+        light_switch_send_on_off_1, cmd_id, 0);
 }
 
 void send_on_off_toggle_cmd(uint16_t endpoint_id) {
     zb_ret_t zb_err_code;
 
     switch (endpoint_id) {
-        case HA_ON_OFF_SWITCH_ENDPOINT:
+        case HA_ON_OFF_SWITCH_ENDPOINT_1:
             // TODO: Look into why this is "delayed"
             zb_err_code = zb_buf_get_out_delayed_ext(
-            light_switch_send_on_off, ZB_ZCL_CMD_ON_OFF_TOGGLE_ID, 0);
+            light_switch_send_on_off_1, ZB_ZCL_CMD_ON_OFF_TOGGLE_ID, 0);
             break;
         case HA_ON_OFF_SWITCH_ENDPOINT_2:
             zb_err_code = zb_buf_get_out_delayed_ext(
             light_switch_send_on_off_2, ZB_ZCL_CMD_ON_OFF_TOGGLE_ID, 0);
+            break;
+        case HA_ON_OFF_SWITCH_ENDPOINT_3:
+            zb_err_code = zb_buf_get_out_delayed_ext(
+            light_switch_send_on_off_3, ZB_ZCL_CMD_ON_OFF_TOGGLE_ID, 0);
+            break;
+        case HA_ON_OFF_SWITCH_ENDPOINT_4:
+            zb_err_code = zb_buf_get_out_delayed_ext(
+            light_switch_send_on_off_4, ZB_ZCL_CMD_ON_OFF_TOGGLE_ID, 0);
             break;
     }
 }
@@ -1117,7 +1146,7 @@ void main(void)
                 }
                 level_control_set_value(level_control_value);
 
-                send_on_off_toggle_cmd(HA_ON_OFF_SWITCH_ENDPOINT);
+                send_on_off_toggle_cmd(HA_ON_OFF_SWITCH_ENDPOINT_1);
             }
 
             set_button_press_handled(&nwk_rst_btn_bp);
