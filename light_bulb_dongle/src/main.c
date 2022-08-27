@@ -210,8 +210,11 @@ typedef struct {
 
     zb_zcl_occupancy_sensing_attrs_t occupancy_sensing_attr;
 
-    zb_zcl_on_off_switch_configuration_attrs_t     switch_on_off_switch_conf_attr;
+    zb_zcl_on_off_switch_configuration_attrs_t     switch_on_off_switch_conf_attr_1;
     zb_zcl_on_off_switch_configuration_attrs_t     switch_on_off_switch_conf_attr_2;
+    zb_zcl_on_off_switch_configuration_attrs_t     switch_on_off_switch_conf_attr_3;
+    zb_zcl_on_off_switch_configuration_attrs_t     switch_on_off_switch_conf_attr_4;
+
     zb_zcl_scenes_attrs_t            switch_scenes_attr;
     zb_zcl_groups_attrs_t            switch_groups_attr;
     zb_zcl_on_off_attrs_t            switch_on_off_attr;
@@ -284,15 +287,15 @@ ZB_ZCL_DECLARE_BASIC_ATTRIB_LIST_EXT(
 // 	&dev_ctx.on_off_attr.on_off);
 
 ZB_ZCL_DECLARE_ON_OFF_SWITCH_CONFIGURATION_ATTRIB_LIST(
-    switch_on_off_switch_conf_attr_list,
-    &dev_ctx.switch_on_off_switch_conf_attr.switch_type,
-    &dev_ctx.switch_on_off_switch_conf_attr.switch_actions
+    switch_on_off_switch_conf_attr_list_1,
+    &dev_ctx.switch_on_off_switch_conf_attr_1.switch_type,
+    &dev_ctx.switch_on_off_switch_conf_attr_1.switch_actions
 );
 
 
 ZB_HA_DECLARE_ON_OFF_SWITCH_CLUSTER_LIST(
-    on_off_switch_clusters,
-    switch_on_off_switch_conf_attr_list, // on off switch config
+    on_off_switch_clusters_1,
+    switch_on_off_switch_conf_attr_list_1, // on off switch config
     identify_attr_list, // identify
     basic_attr_list // basic
     // switch_on_off_attr_list, // on off
@@ -359,9 +362,9 @@ ZB_DECLARE_DIMMABLE_LIGHT_EP(
 //     dimmable_light_ctx);
 
 ZB_HA_DECLARE_ON_OFF_SWITCH_EP(
-    on_off_switch_ep,
+    on_off_switch_ep_1,
     HA_ON_OFF_SWITCH_ENDPOINT,
-    on_off_switch_clusters);
+    on_off_switch_clusters_1);
 
 
 ZB_HA_DECLARE_ON_OFF_SWITCH_EP(
@@ -375,7 +378,7 @@ ZB_HA_DECLARE_ON_OFF_SWITCH_EP(
 ZBOSS_DECLARE_DEVICE_CTX_3_EP(
     dimmable_light_ctx,
     dimmable_light_ep,
-    on_off_switch_ep,
+    on_off_switch_ep_1,
     on_off_switch_ep_2
 );
 
