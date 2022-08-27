@@ -152,14 +152,39 @@
 static const struct gpio_dt_spec button = GPIO_DT_SPEC_GET_OR(PRESENCE_NODE, gpios, {0});
 static struct gpio_callback button_cb_data;
 
-// Button 5
-#define BUTTON_5	DT_ALIAS(button_5)
-#if !DT_NODE_HAS_STATUS(BUTTON_5, okay)
-#error "Unsupported board: button_5 devicetree alias is not defined"
+// static struct gpio_callback button_cb_data;
+
+// EXT_BTN_1
+#define EXT_BTN_1	DT_NODELABEL(ext_btn_1)
+#if !DT_NODE_HAS_STATUS(EXT_BTN_1, okay)
+#error "Unsupported board: ext_btn_1 devicetree alias is not defined"
 #endif
 
-static const struct gpio_dt_spec button_5 = GPIO_DT_SPEC_GET_OR(BUTTON_5, gpios, {0});
-// static struct gpio_callback button_cb_data;
+static const struct gpio_dt_spec ext_btn_1 = GPIO_DT_SPEC_GET_OR(EXT_BTN_1, gpios, {0});
+
+// EXT_BTN_2
+#define EXT_BTN_2	DT_NODELABEL(ext_btn_2)
+#if !DT_NODE_HAS_STATUS(EXT_BTN_2, okay)
+#error "Unsupported board: ext_btn_2 devicetree alias is not defined"
+#endif
+
+static const struct gpio_dt_spec ext_btn_2 = GPIO_DT_SPEC_GET_OR(EXT_BTN_2, gpios, {0});
+
+// EXT_BTN_3
+#define EXT_BTN_3	DT_NODELABEL(ext_btn_3)
+#if !DT_NODE_HAS_STATUS(EXT_BTN_3, okay)
+#error "Unsupported board: ext_btn_3 devicetree alias is not defined"
+#endif
+
+static const struct gpio_dt_spec ext_btn_3 = GPIO_DT_SPEC_GET_OR(EXT_BTN_3, gpios, {0});
+
+// EXT_BTN_4
+#define EXT_BTN_4	DT_NODELABEL(ext_btn_4)
+#if !DT_NODE_HAS_STATUS(EXT_BTN_4, okay)
+#error "Unsupported board: ext_btn_4 devicetree alias is not defined"
+#endif
+
+static const struct gpio_dt_spec ext_btn_4 = GPIO_DT_SPEC_GET_OR(EXT_BTN_4, gpios, {0});
 
 
 /* Led PWM period, calculated for 50 Hz signal - in microseconds. */
@@ -809,7 +834,7 @@ static void zcl_device_cb(zb_bufid_t bufid)
     LOG_INF("%s status: %hd", __func__, device_cb_param->status);
 }
 
-bool status_on = false;
+bool status_on = true;
 zb_zdo_app_signal_type_t g_app_sig;
 zb_ret_t g_app_sig_status;
 
@@ -932,7 +957,10 @@ void main(void)
 
     // Button interrupt - to become prescence sensor
     init_button(button);
-    init_button(button_5);
+    init_button(ext_btn_1);
+    init_button(ext_btn_2);
+    init_button(ext_btn_3);
+    init_button(ext_btn_4);
     // Button end
 
 
@@ -986,10 +1014,10 @@ void main(void)
     bp_handler.gpio = button;
     bp_handler.poll_interval_ms = RUN_LED_BLINK_INTERVAL;
 
-    button_press_handler_t bp_handler_5 = get_button_press_handler();
+    button_press_handler_t bp_handler_ext_1 = get_button_press_handler();
 
-    bp_handler_5.gpio = button_5;
-    bp_handler_5.poll_interval_ms = RUN_LED_BLINK_INTERVAL;
+    bp_handler_ext_1.gpio = ext_btn_1;
+    bp_handler_ext_1.poll_interval_ms = RUN_LED_BLINK_INTERVAL;
 
 
     while (1) {
@@ -1050,16 +1078,16 @@ void main(void)
         }
 
 
-        get_debounced_press(&bp_handler_5);
-        if (!bp_handler_5.press_handled && bp_handler_5.completed_button_press_thresh > 0) {
+        get_debounced_press(&bp_handler_ext_1);
+        if (!bp_handler_ext_1.press_handled && bp_handler_ext_1.completed_button_press_thresh > 0) {
 
-            LOG_INF("Button 5, Debounced press: %d ms", bp_handler_5.completed_button_press_thresh);
+            LOG_INF("Button 5, Debounced press: %d ms", bp_handler_ext_1.completed_button_press_thresh);
 
             send_on_off_toggle_cmd(HA_ON_OFF_SWITCH_ENDPOINT_2);
-            if (bp_handler_5.completed_button_press_thresh > 500) {
+            if (bp_handler_ext_1.completed_button_press_thresh > 500) {
             }
 
-            set_button_press_handled(&bp_handler_5);
+            set_button_press_handled(&bp_handler_ext_1);
         }
 
         // if (toggle_occupancy_flag)

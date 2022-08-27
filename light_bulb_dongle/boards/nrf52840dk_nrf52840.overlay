@@ -19,12 +19,30 @@
 	};
     buttons {
         button4: button_4 {
-            gpios = < &gpio1 0xb 0x11 >; // P1.11 (1.xx inferred by first element `gpio1`, y.11 is inferred by 0xb = 11)
+            gpios = < &gpio1 11 0x11 >; // P1.11 (1.xx inferred by first element `gpio1`, y.11 is inferred by 0xb = 11)
             label = "Presence Sensor";
         };
-        button5: button_5 {
-            gpios = < &gpio1 13 0x11 >;
-            label = "Button 5";
+
+
+        // External buttons
+        ext_btn_1: ext_btn_1 {
+            gpios = < &gpio0 31 0x11 >;
+            label = "External Button 1";
+        };
+
+        ext_btn_2: ext_btn_2 {
+            gpios = < &gpio1 15 0x11 >;
+            label = "External Button 2";
+        };
+
+        ext_btn_3: ext_btn_3 {
+            gpios = < &gpio1 0 0x11 >;
+            label = "External Button 3";
+        };
+
+        ext_btn_4: ext_btn_4 {
+            gpios = < &gpio0 13 0x11 >;
+            label = "External Button 4";
         };
     };
 
@@ -32,7 +50,6 @@
 		pwm-on-board = &pwm_led3;
 		pwm-ext0 = &ext_pwm_led;
         presence-sensor = &button4;
-        button-5 = &button5;
     };
 };
 
