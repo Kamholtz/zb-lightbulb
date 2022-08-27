@@ -59,6 +59,9 @@
 /* Device endpoint, used to receive on off switch commands. */
 #define HA_ON_OFF_SWITCH_ENDPOINT_2   13
 
+/* Device endpoint, used to receive on off switch commands. */
+#define HA_ON_OFF_SWITCH_ENDPOINT_3   14
+
 /* Version of the application software (1 byte). */
 #define BULB_INIT_BASIC_APP_VERSION     01
 
@@ -286,6 +289,7 @@ ZB_ZCL_DECLARE_BASIC_ATTRIB_LIST_EXT(
 // 	switch_on_off_attr_list,
 // 	&dev_ctx.on_off_attr.on_off);
 
+// ON OFF 1
 ZB_ZCL_DECLARE_ON_OFF_SWITCH_CONFIGURATION_ATTRIB_LIST(
     switch_on_off_switch_conf_attr_list_1,
     &dev_ctx.switch_on_off_switch_conf_attr_1.switch_type,
@@ -300,7 +304,7 @@ ZB_HA_DECLARE_ON_OFF_SWITCH_CLUSTER_LIST(
     basic_attr_list // basic
     // switch_on_off_attr_list, // on off
     // switch_scenes_attr_list, // scenes
-    // switch_client_identify_attr_list, // identify - need to make the client version of identify (look at cluster spec for client)
+    // switch_client_identify_attr_list,
     // switch_groups_attr_list // groups
     );
 
@@ -319,7 +323,25 @@ ZB_HA_DECLARE_ON_OFF_SWITCH_CLUSTER_LIST(
     basic_attr_list // basic
     // switch_on_off_attr_list, // on off
     // switch_scenes_attr_list, // scenes
-    // switch_client_identify_attr_list, // identify - need to make the client version of identify (look at cluster spec for client)
+    // switch_client_identify_attr_list,
+    // switch_groups_attr_list // groups
+    );
+
+// ON OFF 3
+ZB_ZCL_DECLARE_ON_OFF_SWITCH_CONFIGURATION_ATTRIB_LIST(
+    switch_on_off_switch_conf_attr_list_3,
+    &dev_ctx.switch_on_off_switch_conf_attr_3.switch_type,
+    &dev_ctx.switch_on_off_switch_conf_attr_3.switch_actions
+);
+
+ZB_HA_DECLARE_ON_OFF_SWITCH_CLUSTER_LIST(
+    on_off_switch_clusters_3,
+    switch_on_off_switch_conf_attr_list_3, // on off switch config
+    identify_attr_list, // identify
+    basic_attr_list // basic
+    // switch_on_off_attr_list, // on off
+    // switch_scenes_attr_list, // scenes
+    // switch_client_identify_attr_list,
     // switch_groups_attr_list // groups
     );
 
@@ -372,17 +394,23 @@ ZB_HA_DECLARE_ON_OFF_SWITCH_EP(
     HA_ON_OFF_SWITCH_ENDPOINT_2,
     on_off_switch_clusters_2);
 
+ZB_HA_DECLARE_ON_OFF_SWITCH_EP(
+    on_off_switch_ep_3,
+    HA_ON_OFF_SWITCH_ENDPOINT_3,
+    on_off_switch_clusters_3);
+
 
 
 // ZB_HA_DECLARE_DIMMABLE_LIGHT_CTX(
 // 	dimmable_light_ctx,
 // 	dimmable_light_ep);
 
-ZBOSS_DECLARE_DEVICE_CTX_3_EP(
+ZBOSS_DECLARE_DEVICE_CTX_4_EP(
     dimmable_light_ctx,
     dimmable_light_ep,
     on_off_switch_ep_1,
-    on_off_switch_ep_2
+    on_off_switch_ep_2,
+    on_off_switch_ep_3
 );
 
 
@@ -1056,7 +1084,7 @@ void main(void)
             LOG_INF("Debounced press: %d ms", nwk_rst_btn_bp.completed_button_press_thresh);
 
             // Rising edge/finger lifted
-            if (nwk_rst_btn_bp.completed_button_press_thresh > 8000) {
+            if (nwk_rst_btn_bp.completed_button_press_thresh > 5000) {
                 // action for 5 second press
                 LOG_INF("8 second button press");
                 LOG_INF("Resetting zigbee network config");
