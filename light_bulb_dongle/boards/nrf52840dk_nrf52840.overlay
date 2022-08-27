@@ -18,11 +18,11 @@
 		};
 	};
     buttons {
-        button4: button_4 {
+        // Also external on the DK
+        nwk_reset_btn: nwk_reset_btn {
             gpios = < &gpio1 11 0x11 >; // P1.11 (1.xx inferred by first element `gpio1`, y.11 is inferred by 0xb = 11)
-            label = "Presence Sensor";
+            label = "nwk_reset_btn";
         };
-
 
         // External buttons
         ext_btn_1: ext_btn_1 {
@@ -49,7 +49,7 @@
     aliases {
 		pwm-on-board = &pwm_led3;
 		pwm-ext0 = &ext_pwm_led;
-        presence-sensor = &button4;
+        presence-sensor = &nwk_reset_btn;
     };
 };
 
