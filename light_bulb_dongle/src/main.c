@@ -897,7 +897,7 @@ void zboss_signal_handler(zb_bufid_t bufid)
             * This should be the third and the last startup signal.
             */
             // k_sem_give(&zboss_init_lock);
-            LOG_INF("Received ZB_COMMON_SIGNAL_CAN_SLEEP");
+            // LOG_INF("Received ZB_COMMON_SIGNAL_CAN_SLEEP");
             zb_sleep_now();
             break;
     }
@@ -1019,10 +1019,15 @@ void main(void)
     nwk_rst_btn_bp.gpio = nwk_rst_btn;
     nwk_rst_btn_bp.poll_interval_ms = RUN_LED_BLINK_INTERVAL;
 
-    button_press_handler_t ext_btn_1_bp = get_button_press_handler();
-    ext_btn_1_bp.gpio = ext_btn_1;
-    ext_btn_1_bp.poll_interval_ms = RUN_LED_BLINK_INTERVAL;
+    button_press_handler_t ext_btn_bps[4];
 
+    ext_btn_bps[0] = get_button_press_handler();
+    ext_btn_bps[1] = get_button_press_handler();
+    ext_btn_bps[2] = get_button_press_handler();
+    ext_btn_bps[3] = get_button_press_handler();
+
+    ext_btn_bps[0].gpio = ext_btn_1;
+    ext_btn_bps[0].poll_interval_ms = RUN_LED_BLINK_INTERVAL;
 
     while (1) {
 
@@ -1082,16 +1087,16 @@ void main(void)
         }
 
 
-        get_debounced_press(&ext_btn_1_bp);
-        if (!ext_btn_1_bp.press_handled && ext_btn_1_bp.completed_button_press_thresh > 0) {
+        get_debounced_press(&ext_btn_bps[0]);
+        if (!ext_btn_bps[0].press_handled && ext_btn_bps[0].completed_button_press_thresh > 0) {
 
-            LOG_INF("Button 5, Debounced press: %d ms", ext_btn_1_bp.completed_button_press_thresh);
+            LOG_INF("Button 5, Debounced press: %d ms", ext_btn_bps[0].completed_button_press_thresh);
 
             send_on_off_toggle_cmd(HA_ON_OFF_SWITCH_ENDPOINT_2);
-            if (ext_btn_1_bp.completed_button_press_thresh > 500) {
+            if (ext_btn_bps[0].completed_button_press_thresh > 500) {
             }
 
-            set_button_press_handled(&ext_btn_1_bp);
+            set_button_press_handled(&ext_btn_bps[0]);
         }
 
         // if (toggle_occupancy_flag)
