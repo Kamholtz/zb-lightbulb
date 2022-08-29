@@ -1157,14 +1157,28 @@ void main(void)
         for (bp_ii = 0; bp_ii < 4; bp_ii++) {
             get_debounced_press(&ext_btn_bps[bp_ii]);
             if (!ext_btn_bps[bp_ii].press_handled && ext_btn_bps[bp_ii].completed_button_press_thresh > 0) {
+                LOG_INF("ext_btn_%d, debounced press: %d ms", bp_ii + 1, ext_btn_bps[bp_ii].completed_button_press_thresh);
 
-                LOG_INF("Button 5, Debounced press: %d ms", ext_btn_bps[bp_ii].completed_button_press_thresh);
-
-                send_on_off_toggle_cmd(HA_ON_OFF_SWITCH_ENDPOINT_2);
-
-                if (ext_btn_bps[bp_ii].completed_button_press_thresh > 500) {
+                switch (bp_ii) {
+                    case 0:
+                        send_on_off_toggle_cmd(HA_ON_OFF_SWITCH_ENDPOINT_1);
+                        break;
+                    case 1:
+                        send_on_off_toggle_cmd(HA_ON_OFF_SWITCH_ENDPOINT_2);
+                        break;
+                    case 2:
+                        send_on_off_toggle_cmd(HA_ON_OFF_SWITCH_ENDPOINT_3);
+                        break;
+                    case 3:
+                        send_on_off_toggle_cmd(HA_ON_OFF_SWITCH_ENDPOINT_4);
+                        break;
                 }
 
+                if (ext_btn_bps[bp_ii].completed_button_press_thresh > 500) {
+                    // Can try sending a different command here
+                }
+
+                // button press handled
                 set_button_press_handled(&ext_btn_bps[bp_ii]);
             }
         }
