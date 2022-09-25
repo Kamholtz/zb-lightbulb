@@ -22,9 +22,25 @@
         // };
 
         // TODO: Disable the SPI peripheral that clashes with this button
-        button5: button_5 {
-            gpios = < &gpio1 13 0x11 >;
-            label = "Button 5";
+        // External buttons
+        ext_btn_1: ext_btn_1 {
+            gpios = < &gpio0 31 0x11 >;
+            label = "External Button 1";
+        };
+
+        ext_btn_2: ext_btn_2 {
+            gpios = < &gpio1 15 0x11 >;
+            label = "External Button 2";
+        };
+
+        ext_btn_3: ext_btn_3 {
+            gpios = < &gpio1 0 0x11 >;
+            label = "External Button 3";
+        };
+
+        ext_btn_4: ext_btn_4 {
+            gpios = < &gpio0 13 0x11 >;
+            label = "External Button 4";
         };
 	};
 
@@ -45,8 +61,7 @@
 	aliases {
         pwm-on-board = &blue_pwm_led;
         pwm-ext0 = &ext_pwm_led;
-        presence-sensor = &button0;
-        button-5 = &button5;
+        nwk-reset-btn = &button0;
         // button-press-pwm-led = &red_pwm_led;
 		rst0 = &rst_button0;
 	};

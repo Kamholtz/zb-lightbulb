@@ -150,7 +150,7 @@
 
 
 // Button 1
-#define NWK_RESET_BTN	DT_NODELABEL(nwk_reset_btn)
+#define NWK_RESET_BTN	DT_ALIAS(nwk_reset_btn)
 #if !DT_NODE_HAS_STATUS(NWK_RESET_BTN, okay)
 #error "Unsupported board: nwk_reset_btn devicetree label is not defined"
 #endif

@@ -50,6 +50,7 @@
 		pwm-on-board = &pwm_led3;
 		pwm-ext0 = &ext_pwm_led;
         presence-sensor = &nwk_reset_btn;
+        nwk-reset-btn = &nwk_reset_btn;
     };
 };
 
