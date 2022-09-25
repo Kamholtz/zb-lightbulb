@@ -37,6 +37,7 @@
 #include "zb_dimmable_light.h"
 #include "zb_ha_on_off_switch.h"
 #include "button_press_handler/button_press_handler.h"
+#include "zboss_ext/zboss_api_af_ext.h"
 // #include <zb_zcl_occupancy_sensing.h>
 
 // #define INCLUDE_DONGLE_USB_LOGGING 1 // If this is uncommented, USB output will be enabled. In its current state, it only transmits what it receives. It is still a POC for eventually setting up USB logging backend of the dongle
@@ -348,6 +349,24 @@ ZB_HA_DECLARE_ON_OFF_SWITCH_CLUSTER_LIST(
     // switch_groups_attr_list // groups
     );
 
+// ON OFF 4
+ZB_ZCL_DECLARE_ON_OFF_SWITCH_CONFIGURATION_ATTRIB_LIST(
+    switch_on_off_switch_conf_attr_list_4,
+    &dev_ctx.switch_on_off_switch_conf_attr_4.switch_type,
+    &dev_ctx.switch_on_off_switch_conf_attr_4.switch_actions
+);
+
+ZB_HA_DECLARE_ON_OFF_SWITCH_CLUSTER_LIST(
+    on_off_switch_clusters_4,
+    switch_on_off_switch_conf_attr_list_4, // on off switch config
+    identify_attr_list, // identify
+    basic_attr_list // basic
+    // switch_on_off_attr_list, // on off
+    // switch_scenes_attr_list, // scenes
+    // switch_client_identify_attr_list,
+    // switch_groups_attr_list // groups
+    );
+
 /* On/Off cluster attributes additions data */
 ZB_ZCL_DECLARE_ON_OFF_ATTRIB_LIST(
     on_off_attr_list,
@@ -402,18 +421,24 @@ ZB_HA_DECLARE_ON_OFF_SWITCH_EP(
     HA_ON_OFF_SWITCH_ENDPOINT_3,
     on_off_switch_clusters_3);
 
+ZB_HA_DECLARE_ON_OFF_SWITCH_EP(
+    on_off_switch_ep_4,
+    HA_ON_OFF_SWITCH_ENDPOINT_4,
+    on_off_switch_clusters_4);
+
 
 
 // ZB_HA_DECLARE_DIMMABLE_LIGHT_CTX(
 // 	dimmable_light_ctx,
 // 	dimmable_light_ep);
 
-ZBOSS_DECLARE_DEVICE_CTX_4_EP(
+ZBOSS_DECLARE_DEVICE_CTX_5_EP(
     dimmable_light_ctx,
     dimmable_light_ep,
     on_off_switch_ep_1,
     on_off_switch_ep_2,
-    on_off_switch_ep_3
+    on_off_switch_ep_3,
+    on_off_switch_ep_4
 );
 
 
