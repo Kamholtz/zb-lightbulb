@@ -922,7 +922,7 @@ static void zcl_device_cb(zb_bufid_t bufid)
     LOG_INF("%s status: %hd", __func__, device_cb_param->status);
 }
 
-bool status_on = true;
+bool status_on = false;
 zb_zdo_app_signal_type_t g_app_sig;
 zb_ret_t g_app_sig_status;
 
@@ -1133,6 +1133,8 @@ void main(void)
 
         k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
         get_debounced_press(&nwk_rst_btn_bp);
+
+        // TODO: press two buttons at once to turn off led?
 
         if (!nwk_rst_btn_bp.press_handled && nwk_rst_btn_bp.completed_button_press_thresh > 0) {
             LOG_INF("Debounced press: %d ms", nwk_rst_btn_bp.completed_button_press_thresh);
