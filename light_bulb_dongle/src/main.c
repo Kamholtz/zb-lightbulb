@@ -79,6 +79,7 @@
 #define BULB_INIT_BASIC_MANUF_NAME      "Nordic"
 
 /* Model number assigned by manufacturer (32-bytes long string). */
+// TODO: remove the version from the name
 #define BULB_INIT_BASIC_MODEL_ID        "Dimable_Light_v0.1" // DK
 // #define BULB_INIT_BASIC_MODEL_ID        "Dimable_Light_v0.1" // Dongle
 
@@ -432,6 +433,7 @@ ZB_HA_DECLARE_ON_OFF_SWITCH_EP(
 // 	dimmable_light_ctx,
 // 	dimmable_light_ep);
 
+// TODO: Add more end points
 ZBOSS_DECLARE_DEVICE_CTX_5_EP(
     dimmable_light_ctx,
     dimmable_light_ep,
@@ -1096,6 +1098,7 @@ void main(void)
     const int blink_toggle = (1000/RUN_LED_BLINK_INTERVAL);
     const uint8_t level_control_inc = UINT8_MAX/3;
     uint8_t level_control_value = 0;
+    bool temp_status_on = false;
 
     button_press_handler_t nwk_rst_btn_bp = get_button_press_handler();
     nwk_rst_btn_bp.gpio = nwk_rst_btn;
