@@ -710,36 +710,37 @@ zb_uint16_t get_on_off_cmd_id(bool isOn) {
     return cmd_id;
 }
 
-void send_on_off_cmd(bool isOn) {
-    zb_ret_t zb_err_code;
+// Removed in favour of just sending the toggle command
+// void send_on_off_cmd(bool isOn) {
+//     zb_ret_t zb_err_code;
+//
+//     zb_uindex_t cmd_id = get_on_off_cmd_id(isOn);
+//
+//     // TODO: Look into why this is "delayed"
+//     zb_err_code = zb_buf_get_out_delayed_ext(
+//         light_switch_send_on_off_1, cmd_id, 0);
+// }
 
-    zb_uindex_t cmd_id = get_on_off_cmd_id(isOn);
-
-    // TODO: Look into why this is "delayed"
-    zb_err_code = zb_buf_get_out_delayed_ext(
-        light_switch_send_on_off_1, cmd_id, 0);
-}
-
-void send_on_off_toggle_cmd(uint16_t endpoint_id) {
+void send_on_off_cmd(uint16_t endpoint_id, zb_uint16_t cmd_id) {
     zb_ret_t zb_err_code;
 
     switch (endpoint_id) {
         case HA_ON_OFF_SWITCH_ENDPOINT_1:
             // TODO: Look into why this is "delayed"
             zb_err_code = zb_buf_get_out_delayed_ext(
-            light_switch_send_on_off_1, ZB_ZCL_CMD_ON_OFF_TOGGLE_ID, 0);
+            light_switch_send_on_off_1, cmd_id, 0);
             break;
         case HA_ON_OFF_SWITCH_ENDPOINT_2:
             zb_err_code = zb_buf_get_out_delayed_ext(
-            light_switch_send_on_off_2, ZB_ZCL_CMD_ON_OFF_TOGGLE_ID, 0);
+            light_switch_send_on_off_2, cmd_id, 0);
             break;
         case HA_ON_OFF_SWITCH_ENDPOINT_3:
             zb_err_code = zb_buf_get_out_delayed_ext(
-            light_switch_send_on_off_3, ZB_ZCL_CMD_ON_OFF_TOGGLE_ID, 0);
+            light_switch_send_on_off_3, cmd_id, 0);
             break;
         case HA_ON_OFF_SWITCH_ENDPOINT_4:
             zb_err_code = zb_buf_get_out_delayed_ext(
-            light_switch_send_on_off_4, ZB_ZCL_CMD_ON_OFF_TOGGLE_ID, 0);
+            light_switch_send_on_off_4, cmd_id, 0);
             break;
     }
 }
@@ -1126,7 +1127,7 @@ void main(void)
     while (1) {
 
         // Status LED
-        if (status_on) {
+        if (status_on || temp_status_on) {
             dk_set_led(RUN_STATUS_LED, (blink_status) % 2);
             if (loop_count % blink_toggle == 0) {
                 blink_status++;
@@ -1137,13 +1138,18 @@ void main(void)
         k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
         get_debounced_press(&nwk_rst_btn_bp);
 
-        // TODO: press two buttons at once to turn off led?
+        // TODO: press two buttons at once to turn off led? Or act as another button
+        if (nwk_rst_btn_bp.is_debounced && nwk_rst_btn_bp.press_timer_ms > 1000) {
+            temp_status_on = true;
+        } else {
+            temp_status_on = false;
+        }
 
         if (!nwk_rst_btn_bp.press_handled && nwk_rst_btn_bp.completed_button_press_thresh > 0) {
             LOG_INF("Debounced press: %d ms", nwk_rst_btn_bp.completed_button_press_thresh);
 
             // Rising edge/finger lifted
-            if (nwk_rst_btn_bp.completed_button_press_thresh > 5000) {
+            if (nwk_rst_btn_bp.completed_button_press_thresh > 8000) {
                 // action for 5 second press
                 LOG_INF("8 second button press");
                 LOG_INF("Resetting zigbee network config");
@@ -1176,7 +1182,7 @@ void main(void)
                 }
                 level_control_set_value(level_control_value);
 
-                send_on_off_toggle_cmd(HA_ON_OFF_SWITCH_ENDPOINT_1);
+                send_on_off_cmd(HA_ON_OFF_SWITCH_ENDPOINT_1, ZB_ZCL_CMD_ON_OFF_TOGGLE_ID);
             }
 
             set_button_press_handled(&nwk_rst_btn_bp);
@@ -1189,23 +1195,42 @@ void main(void)
             if (!ext_btn_bps[bp_ii].press_handled && ext_btn_bps[bp_ii].completed_button_press_thresh > 0) {
                 LOG_INF("ext_btn_%d, debounced press: %d ms", bp_ii + 1, ext_btn_bps[bp_ii].completed_button_press_thresh);
 
-                switch (bp_ii) {
-                    case 0:
-                        send_on_off_toggle_cmd(HA_ON_OFF_SWITCH_ENDPOINT_1);
-                        break;
-                    case 1:
-                        send_on_off_toggle_cmd(HA_ON_OFF_SWITCH_ENDPOINT_2);
-                        break;
-                    case 2:
-                        send_on_off_toggle_cmd(HA_ON_OFF_SWITCH_ENDPOINT_3);
-                        break;
-                    case 3:
-                        send_on_off_toggle_cmd(HA_ON_OFF_SWITCH_ENDPOINT_4);
-                        break;
+
+                zb_uint16_t cmd = ZB_ZCL_CMD_ON_OFF_TOGGLE_ID;
+
+                if (ext_btn_bps[bp_ii].completed_button_press_thresh > 3000) {
+                    // long press and hold
+                    LOG_INF("ext_btn_%d, cmd: OFF", bp_ii + 1);
+                    cmd = ZB_ZCL_CMD_ON_OFF_OFF_ID;
+                } else if (ext_btn_bps[bp_ii].completed_button_press_thresh > 1000) {
+                    // short press and hold
+                    LOG_INF("ext_btn_%d, cmd: ON", bp_ii + 1);
+                    cmd = ZB_ZCL_CMD_ON_OFF_ON_ID;
+                } else {
+                    // momentary press
+                    LOG_INF("ext_btn_%d, cmd: TOGGLE", bp_ii + 1);
+                    cmd = ZB_ZCL_CMD_ON_OFF_TOGGLE_ID;
                 }
 
-                if (ext_btn_bps[bp_ii].completed_button_press_thresh > 500) {
-                    // Can try sending a different command here
+
+                LOG_INF("ext_btn_%d, cmd: %d", bp_ii + 1, cmd);
+
+
+                // TODO blink an LED to indicate which state you have reached
+
+                switch (bp_ii) {
+                    case 0:
+                        send_on_off_cmd(HA_ON_OFF_SWITCH_ENDPOINT_1, cmd);
+                        break;
+                    case 1:
+                        send_on_off_cmd(HA_ON_OFF_SWITCH_ENDPOINT_2, cmd);
+                        break;
+                    case 2:
+                        send_on_off_cmd(HA_ON_OFF_SWITCH_ENDPOINT_3, cmd);
+                        break;
+                    case 3:
+                        send_on_off_cmd(HA_ON_OFF_SWITCH_ENDPOINT_4, cmd);
+                        break;
                 }
 
                 // button press handled
